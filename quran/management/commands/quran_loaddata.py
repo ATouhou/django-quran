@@ -6,18 +6,18 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
         if Aya.objects.count() > 0:
-            print 'The quran database must be empty before running quran_loaddata. Running tests.'
+            print ('The quran database must be empty before running quran_loaddata. Running tests.')
             test_data(verbosity=options['verbosity'])
             return
 
-        print "----- importing quran data (Tanzil) -----"
+        print ("----- importing quran data (Tanzil) -----")
         import_quran()
 
-        print "----- done importing quran data (Tanzil). starting translations -----"
+        print ("----- done importing quran data (Tanzil). starting translations -----")
         import_translations()
 
-        print "----- done importing translations. starting morphology -----"
+        print ("----- done importing translations. starting morphology -----")
         import_morphology()
 
-        print "----- done importing morphology. running tests -----"
+        print ("----- done importing morphology. running tests -----")
         test_data(verbosity=options['verbosity'])

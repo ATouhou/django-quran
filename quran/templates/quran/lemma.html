@@ -1,10 +1,10 @@
 {{ lemma.token }}
 <hr>
-Root: 
+Root:
 {% if root %}
-    <a href="{{ root.get_absolute_url }}">{{ root }}</a>
+<a href="{{ root.get_absolute_url }}">{{ root }}</a>
 {% else %}
-    Unknown
+Unknown
 {% endif %}
 <hr>
 <ul>
