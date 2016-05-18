@@ -93,40 +93,6 @@ def extract_root(morphology):
     return root
 
 
-def import_morphology_xml():
-    d = parse(path_to('corpus/quranic-corpus-morphology-0.2.xml'))
-    suras = d.getElementsByTagName('chapter')
-    for s in suras:
-        sura_number = int(s.getAttribute('number'))
-        sura = Sura.objects.get(number=sura_number)
-        ayas = s.getElementsByTagName('verse')
-        for a in ayas:
-            aya_number = int(a.getAttribute('number'))
-            aya = Aya.objects.get(sura=sura, number=aya_number)
-            words = a.getElementsByTagName('word')
-            for w in words:
-                number = int(w.getAttribute('number'))
-                token = w.getAttribute('token')
-                morphology = w.getAttribute('morphology')
-
-                lemma = None
-                dtoken = token
-                root = extract_root(morphology)
-                lem = extract_lem(morphology)
-                if lem: dtoken = lem
-
-                try:
-                    lemma = Lemma.objects.get(token=dtoken)
-                except Lemma.DoesNotExist:
-                    lemma = Lemma(token=dtoken, root=root)
-                    lemma.save()
-
-                word = Word(sura=sura, aya=aya, number=number, token=token, root=root, lemma=lemma)
-                word.save()
-
-            print ("[morphology] %d:%d" % (sura.number, aya.number))
-
-
 def import_morphology_txt():
     sura = Sura.objects.get(number=2)
     aya = Aya.objects.get(sura=sura, number=2) # any aya except the first.
