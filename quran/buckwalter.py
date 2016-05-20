@@ -83,9 +83,9 @@ def buckwalter_to_unicode(str):
     return ret
 
 
-def unicode_to_buckwalter(str):
+def buckwalter(str):
     """
-    >>> unicode_to_buckwalter(u'\u064a\u064e\u062d\u0652\u064a\u064e\u0649\u0670')
+    >>> buckwalter(u'\u064a\u064e\u062d\u0652\u064a\u064e\u0649\u0670')
     'yaHoyaY`'
     """
     ret = ""

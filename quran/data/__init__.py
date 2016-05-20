@@ -13,22 +13,23 @@ def path_to(fn):
 
 @transaction.atomic
 def import_quran():
-    d = parse(path_to('tanzil/quran-data.xml'))
-    d2 = parse(path_to('tanzil/quran-uthmani.xml'))
-    suras = d.getElementsByTagName('sura')
-    for s in suras:
-        index = int(s.getAttribute('index'))
-        ayas = s.getAttribute('ayas')
-        start = int(s.getAttribute('start'))
-        name = s.getAttribute('name')
-        tname = s.getAttribute('tname')
-        ename = s.getAttribute('ename')
-        type = s.getAttribute('type')
-        order = int(s.getAttribute('order'))
-        rukus = int(s.getAttribute('rukus'))
-        sura_model = Sura(number=index, name=name, tname=tname, ename=ename, type=type, order=order, rukus=rukus)
+    quran_data = parse(path_to('tanzil/quran-data.xml'))
+    quran = parse(path_to('tanzil/quran-uthmani.xml'))
+    sura_datas = quran_data.getElementsByTagName('sura')
 
-        sura = d2.getElementsByTagName('sura')[index - 1]
+    for sura_data in sura_datas:
+        index = int(sura_data.getAttribute('index'))
+        ayas = sura_data.getAttribute('ayas')
+        name = sura_data.getAttribute('name')
+        tname = sura_data.getAttribute('tname')
+        ename = sura_data.getAttribute('ename')
+        type_ = sura_data.getAttribute('type')
+        order = int(sura_data.getAttribute('order'))
+        rukus = int(sura_data.getAttribute('rukus'))
+
+        sura_model = Sura(number=index, name=name, tname=tname, ename=ename, type=type_, order=order, rukus=rukus, aya_number=ayas)
+
+        sura = quran.getElementsByTagName('sura')[index - 1]
         assert int(sura.getAttribute('index')) == sura_model.number
         sura_model.save()
 
@@ -37,22 +38,22 @@ def import_quran():
         for aya in ayas:
             index = int(aya.getAttribute('index'))
             text = aya.getAttribute('text')
-            aya_model = Aya(sura=sura_model, number=index, text=text)
+            aya_model = Aya(sura=sura_model, number=index, text=text, bismillah=bismillah)
             aya_model.save()
             print ("%d:%d" % (sura_model.number, index))
 
 
 @transaction.atomic
-def import_translation_txt(path, translation):
-    print ("Importing %s translation" % (translation.name))
-    f = open(path)
+def import_translation_txt(path_, translation):
+    print ("Importing %s translation" % translation.name)
+    f = open(path_)
     ayas = Aya.objects.all()
     for aya in ayas:
         line = f.readline()
         if len(line) <= 1:
-            raise Exception('Translation file [%s] ended preemtively on aya %d:%d' % (path, aya.sura_id, aya.number))
+            raise Exception('Translation file [%s] ended preemtively on aya %d:%d' % (path_, aya.sura_id, aya.number))
         line = line.strip()
-        t = TranslatedAya(sura=aya.sura, aya=aya, translation=translation, text=line)
+        t = AyaTranslation(sura=aya.sura, aya=aya, translation=translation, text=line)
         t.save()
         print ("[%s] %d:%d" % (translation.name, aya.sura_id, aya.number))
 
@@ -61,83 +62,109 @@ def import_translations():
     translator_data = open(path_to('zekr/translator_data.txt'))
     for line in translator_data.readlines():
         name,translator,source_name,source_url,filename = line.strip().split(';')
-
-        translation = QuranTranslation(name=name,translator=translator, source_name=source_name, source_url=source_url)
+        translation = Translation(name=name, translator=translator, source_name=source_name, source_url=source_url)
         translation.save()
         import_translation_txt(path_to('zekr/%s' % filename), translation)
 
 
-def extract_lem(morphology):
-    p = re.compile('LEM:(?P<lem>[^ "]+)')
-    m = p.search(morphology)
-    r = None
-    word = None
-    if(m):
-        r = buckwalter_to_unicode(m.group('lem'))
-    return r
-
-
-def extract_root(morphology):
-    p = re.compile('ROOT:(?P<root>[^ "]+)')
-    m = p.search(morphology)
-    r = None
-    root = None
-    if m:
-        r = buckwalter_to_unicode(m.group('root'))
-    if r:
-        try:
-            root = Root.objects.get(letters=r)
-        except Root.DoesNotExist:
-            root = Root(letters=r)
-            root.save()
-    return root
-
-
-def import_morphology_txt():
+def import_morphology():
     sura = Sura.objects.get(number=2)
     aya = Aya.objects.get(sura=sura, number=2) # any aya except the first.
-    f = open(path_to('corpus/quranic-corpus-morphology-0.2.txt'))
+    word = Word(number=-1) # non existent word to begin with
+    f = open(path_to('corpus/quranic-corpus-morphology-0.4.txt'))
 
     line = f.readline()
     while len(line) > 0:
-        parts = line.strip().split('|')
-        sura_number = 0
+        parts = line.strip().split('\t')
+        numbers = parts[0].split('(:)')
+
         try:
-            sura_number = int(parts[0])
+            sura_number = int(numbers[0])
+            aya_number = int(numbers[1])
+            word_number = int(numbers[2])
+            segment_number = int(numbers[3])
         except ValueError:
             line = f.readline()
             continue
-        aya_number = int(parts[1])
-        word_number = int(parts[2])
-        token = parts[3]
-        morphology = parts[4]
 
-        if aya_number is not aya.number:
-            if sura_number is not sura.number:
-                sura = Sura.objects.get(number=sura_number)
-            aya = Aya.objects.get(sura=sura, number=aya_number)
-            print ("[morphology] %d:%d" % (sura.number, aya.number))
+        text = parts[1]
+        pos = parts[2]
+        morphology = parts[3].split('|')
 
-        lemma = None
-        dtoken = token
-        root = extract_root(morphology)
-        lem = extract_lem(morphology)
-        if lem: dtoken = lem
+        if word_number is not word.number:
+            if aya_number is not aya.number:
+                if sura_number is not sura.number:
+                    sura = Sura.objects.get(number=sura_number)
+                aya = Aya.objects.get(sura=sura, number=aya_number)
+            word = Word.objects.get_or_create(number=word_number)
+            # print ("[morphology] %d:%d" % (sura.number, aya.number))
 
-        try:
-            lemma = Lemma.objects.get(token=dtoken)
-        except Lemma.DoesNotExist:
-            lemma = Lemma(token=dtoken, root=root)
-            lemma.save()
+        lemma_text = None
+        root_text = None
+        segment_props = {'pos': pos, 'text': text}
+        for prop in morphology:
+            if "LEM" in prop:
+                lemma_text = prop[4:] # stash because it has to be done with the root (if any)
+            if "ROOT" in prop:
+                root_text = prop[5:] # stash
+            else:
+                decorate_segment(segment_props, prop)
 
-        word = Word(sura=sura, aya=aya, number=word_number, token=token, root=root, lemma=lemma)
-        word.save()
+        if lemma_text:
+            root = None
+            if root_text:
+                root=Root.objects.get_or_create(text=root_text)
+            segment_props.lemma = Lemma.objects.get_or_create(text=lemma_text, root=root)
+
+        segment=Segment.objects.get_or_create(**segment_props)
+        word_segment = WordSegment(word=word, number=segment_number, segment=segment)
+        word_segment.save()
 
         line = f.readline()
 
 
-def import_morphology():
-    return import_morphology_txt()
+def decorate_segment(props, prop):
+    skip = ["wa+", "Al+", "POS", "l", "PCPL", "f", "w"]
+    for item in skip:
+        if item in prop:
+            return
+
+    if "LEM" in prop:
+        props.lemma = Lemma.objects.get_or_create(text=prop[4:], root=props.root)
+        return
+    if "ROOT" in prop:
+        if not props.lemma:
+            print("root without lemma!")
+        props.lemma.root = Root.objects.get_or_create(text=prop[5:])
+        return
+
+    if "MOOD" in prop:
+        props.mood = prop[5:]
+        return
+    if "PRON" in prop:
+        props.gender = prop[5:]
+        return
+    if "(" in prop:
+        props.form = prop[1:-1]
+        return
+    if "SP" in prop:
+        props.special = prop[3:]
+        return
+
+    if ":" not in prop:
+        lists = {  # non-titled fields
+            'gender': ["3MP", "3MD", "3MS", "3FP", "3FS", "3FD", "2MP", "2MD", "2MS", "2FP", "2FD", "2FS", "1S", "1P", "MP", "MS", "FP", "FS", "F"],
+            'case': ["GEN", "ACC", "NOM"],
+            'definite': ["DEF", "INDEF"],
+            'tense': ["PERF", "IMPF", "IMPV"],
+            'participle': ["ACT", "PASS", "VN"],
+        }
+        for name, list_ in lists:
+            if prop in list_:
+                props.name=prop
+                return
+
+    print("unknown header in: %", prop) # worst case - something left unresolved
 
 
 def test_data(verbosity):
@@ -178,6 +205,6 @@ class DataIntegrityTestCase(unittest.TestCase):
         aya_number = 4
         sura = Sura.objects.get(number=sura_number)
         aya = sura.ayas.get(number=aya_number)
-        translation = QuranTranslation.objects.get(name='Yusuf Ali')
+        translation = Translation.objects.get(name='Yusuf Ali')
         t = aya.translations.get(translation=translation)
         self.assertEquals(t.text, 'And there is none like unto Him.')

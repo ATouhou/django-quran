@@ -9,18 +9,18 @@ root_dir = os.path.dirname(__file__)
 if root_dir:
     os.chdir(root_dir)
 
-for dirpath, dirnames, filenames in os.walk('quran'):
-    # Ignore dirnames that start with '.'
-    for i, dirname in enumerate(dirnames):
-        if dirname.startswith('.'): del dirnames[i]
-    if '__init__.py' in filenames:
-        pkg = dirpath.replace(os.path.sep, '.')
+for dir_path, dir_names, file_names in os.walk('quran'):
+    # Ignore dir_names that start with '.'
+    for i, dir_name in enumerate(dir_names):
+        if dir_name.startswith('.'): del dir_names[i]
+    if '__init__.py' in file_names:
+        pkg = dir_path.replace(os.path.sep, '.')
         if os.path.altsep:
             pkg = pkg.replace(os.path.altsep, '.')
         packages.append(pkg)
-    elif filenames:
-        prefix = dirpath[6:] # Strip "quran/" or "quran\"
-        for f in filenames:
+    elif file_names:
+        prefix = dir_path[6:] # Strip "quran/" or "quran\"
+        for f in file_names:
             data_files.append(os.path.join(prefix, f))
 
 
@@ -35,7 +35,7 @@ setup(
     name = "django-quran",
     version = "0.1",
     author = "Idris Mokhtarzada",
-    description = ("Quranic models and helpers for use in Django projects"),
+    description ="Quranic models and helpers for use in Django projects",
     license = "BSD",
     keywords = "django quran islam arabic",
     url = "http://github.com/idris/django-quran",
@@ -50,5 +50,5 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-    ],
+    ], requires=['django']
 )

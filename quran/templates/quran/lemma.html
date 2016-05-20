@@ -1,4 +1,4 @@
-{{ lemma.token }}
+{{ lemma.text }}
 <hr>
 Root:
 {% if root %}
@@ -10,7 +10,7 @@ Unknown
 <ul>
     {% for w in words %}
     <li>
-        <a href="{{ w.get_absolute_url }}">{{ w.token }}</a>
+        <a href="{{ w.get_absolute_url }}">{{ w.text }}</a>
         <div>{{ w.aya.sura_id }}:{{ w.aya.number }}. <span class="aya">{{ w.aya.text }}</span></div>
     </li>
     {% endfor %}
