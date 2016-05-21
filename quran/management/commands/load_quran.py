@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from quran.data import *
+from quran.load import *
 
 class Command(BaseCommand):
     help = "Load initial Quran data."

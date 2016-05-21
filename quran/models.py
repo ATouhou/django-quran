@@ -233,5 +233,3 @@ class Other(SegmentFeature):
     category = models.CharField(max_length=50, null=True, blank=True)
     pass
 
-
-
