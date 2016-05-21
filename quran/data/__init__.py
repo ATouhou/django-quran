@@ -1,8 +1,12 @@
 import re
 import unittest
+
+from datetime import timedelta
+import time
 from os import path
 from xml.dom.minidom import parse, parseString
 from django.db import transaction
+from django.apps import apps
 
 from quran.models import *
 from quran.buckwalter import *
@@ -10,6 +14,7 @@ from quran.buckwalter import *
 
 def path_to(fn):
     return path.join(path.dirname(__file__), fn)
+
 
 @transaction.atomic
 def import_quran():
@@ -40,12 +45,12 @@ def import_quran():
             text = aya.getAttribute('text')
             aya_model = Aya(sura=sura_model, number=index, text=text, bismillah=bismillah)
             aya_model.save()
-            print ("%d:%d" % (sura_model.number, index))
+            print("%d:%d" % (sura_model.number, index))
 
 
 @transaction.atomic
 def import_translation_txt(path_, translation):
-    print ("Importing %s translation" % translation.name)
+    print("Importing %s translation" % translation.name)
     f = open(path_)
     ayas = Aya.objects.all()
     for aya in ayas:
@@ -55,13 +60,13 @@ def import_translation_txt(path_, translation):
         line = line.strip()
         t = AyaTranslation(sura=aya.sura, aya=aya, translation=translation, text=line)
         t.save()
-        print ("[%s] %d:%d" % (translation.name, aya.sura_id, aya.number))
+        print("[%s] %d:%d" % (translation.name, aya.sura_id, aya.number))
 
 
 def import_translations():
     translator_data = open(path_to('zekr/translator_data.txt'))
     for line in translator_data.readlines():
-        name,translator,source_name,source_url,filename = line.strip().split(';')
+        name, translator, source_name, source_url, filename = line.strip().split(';')
         translation = Translation(name=name, translator=translator, source_name=source_name, source_url=source_url)
         translation.save()
         import_translation_txt(path_to('zekr/%s' % filename), translation)
@@ -69,14 +74,17 @@ def import_translations():
 
 def import_morphology():
     sura = Sura.objects.get(number=2)
-    aya = Aya.objects.get(sura=sura, number=2) # any aya except the first.
-    word = Word(number=-1) # non existent word to begin with
+    aya = Aya.objects.get(sura=sura, number=2)  # any aya except the first.
+    word = Word(number=-1)  # non existent word to begin with
     f = open(path_to('corpus/quranic-corpus-morphology-0.4.txt'))
+
+    time_begin = time.time()
 
     line = f.readline()
     while len(line) > 0:
         parts = line.strip().split('\t')
-        numbers = parts[0].split('(:)')
+        numbers = parts[0]
+        numbers = numbers[1:-1].split(':')  # throw first and last characters and split
 
         try:
             sura_number = int(numbers[0])
@@ -87,89 +95,129 @@ def import_morphology():
             line = f.readline()
             continue
 
+        # print("%d.%d.%d.%d" % (sura_number, aya_number, word_number, segment_number))
+
         text = parts[1]
-        pos = parts[2]
+        pos, created = Pos.objects.get_or_create(pk=parts[2])
         morphology = parts[3].split('|')
 
         if word_number is not word.number:
             if aya_number is not aya.number:
                 if sura_number is not sura.number:
                     sura = Sura.objects.get(number=sura_number)
+                    print("Sura: %d started,    Time passed: %s" % (sura_number, str(timedelta(seconds=time.time() - time_begin))))
                 aya = Aya.objects.get(sura=sura, number=aya_number)
-            word = Word.objects.get_or_create(number=word_number)
+            word, created = Word.objects.get_or_create(sura=sura, aya=aya, number=word_number)
             # print ("[morphology] %d:%d" % (sura.number, aya.number))
 
         lemma_text = None
         root_text = None
-        segment_props = {'pos': pos, 'text': text}
-        for prop in morphology:
-            if "LEM" in prop:
-                lemma_text = prop[4:] # stash because it has to be done with the root (if any)
-            if "ROOT" in prop:
-                root_text = prop[5:] # stash
+        segment_props = {
+            'pos': pos,
+            'text': text,
+            'lemma': None,
+            'mood': None,
+            'gender': None,
+            'form': None,
+            'special': None,
+            'case': None,
+            'definite': None,
+            'tense': None,
+            'participle': None,
+            'other': None,
+            }
+
+        segment_type = morphology[0].lower()  # prefix, stem, or suffix
+        morphology = morphology[1:]
+
+        if segment_type == 'prefix':
+            if morphology.__len__() > 1:
+                print("more than 1 tag in prefix: %s" % word)
             else:
-                decorate_segment(segment_props, prop)
+                if ':' in morphology[0]:
+                    morphology = morphology[0].split(':')[0] # take the part before ":", part after : repeats POS
+                prefix, created = Other.objects.get_or_create(pk=morphology[0], category='prefix')
+                segment_props['other'] = prefix
+        else:
+            for prop in morphology:
+                if "LEM" in prop:
+                    lemma_text = prop[4:]  # stash because it has to be done with the root (if any)
+                elif "ROOT" in prop:
+                    root_text = prop[5:]  # stash
+                else:
+                    decorate_segment(segment_props, prop, segment_type)
 
-        if lemma_text:
-            root = None
-            if root_text:
-                root=Root.objects.get_or_create(text=root_text)
-            segment_props.lemma = Lemma.objects.get_or_create(text=lemma_text, root=root)
+            if lemma_text:
+                root = None
+                if root_text:
+                    root, created = Root.objects.get_or_create(text=root_text)
+                segment_props['lemma'], created = Lemma.objects.get_or_create(text=lemma_text, root=root)
+            elif root_text:
+                print("root without lemma: %s" % root_text)
 
-        segment=Segment.objects.get_or_create(**segment_props)
-        word_segment = WordSegment(word=word, number=segment_number, segment=segment)
+        segment, created = Segment.objects.get_or_create(**segment_props)
+        word_segment = WordSegment(word=word, number=segment_number, segment=segment, type=segment_type)
         word_segment.save()
 
         line = f.readline()
 
 
-def decorate_segment(props, prop):
-    skip = ["wa+", "Al+", "POS", "l", "PCPL", "f", "w"]
-    for item in skip:
-        if item in prop:
+def decorate_segment(segment_props, prop, segment_type):
+    title = None
+    skip = ["POS", "PCPL"]
+    lists = {
+        'Gender': ["3MP", "3MD", "3D", "3MS", "3FD", "3FP", "3FS",
+                   "2MP", "2MD", "2D", "2MS", "2FD", "2FP", "2FS",
+                   "1S", "1P", "MP", "MD", "MS", "FP", "FD", "FS", "F", "M", "P"],
+        'Case': ["GEN", "ACC", "NOM"],
+        'Definite': ["DEF", "INDEF"],
+        'Tense': ["PERF", "IMPF", "IMPV"],
+        'Participle': ["ACT", "PASS", "VN"],
+    }
+
+    if ':' in prop:  # titled
+        prop = prop.split(':')
+        title = prop[0]
+        tag = prop[1]
+        if title in skip:
+            return
+    else:  # non-titled
+        tag = prop
+        if prop in skip:
             return
 
-    if "LEM" in prop:
-        props.lemma = Lemma.objects.get_or_create(text=prop[4:], root=props.root)
-        return
-    if "ROOT" in prop:
-        if not props.lemma:
-            print("root without lemma!")
-        props.lemma.root = Root.objects.get_or_create(text=prop[5:])
+    if segment_type == 'suffix' and tag not in lists['Gender']:
+        segment_props['other'], created = Other.objects.get_or_create(pk=tag, category="suffix")
         return
 
-    if "MOOD" in prop:
-        props.mood = prop[5:]
+    # titled fields
+    if title == "MOOD":
+        segment_props['mood'], created = Mood.objects.get_or_create(pk=tag)
         return
-    if "PRON" in prop:
-        props.gender = prop[5:]
+    if title == "PRON":
+        segment_props['gender'], created = Gender.objects.get_or_create(pk=tag)
         return
-    if "(" in prop:
-        props.form = prop[1:-1]
+    if "(" in tag:
+        segment_props['form'], created = Form.objects.get_or_create(pk=tag[1:-1])
         return
-    if "SP" in prop:
-        props.special = prop[3:]
+    if title == "SP":
+        segment_props['special'], created = Special.objects.get_or_create(pk=tag)
         return
 
-    if ":" not in prop:
-        lists = {  # non-titled fields
-            'gender': ["3MP", "3MD", "3MS", "3FP", "3FS", "3FD", "2MP", "2MD", "2MS", "2FP", "2FD", "2FS", "1S", "1P", "MP", "MS", "FP", "FS", "F"],
-            'case': ["GEN", "ACC", "NOM"],
-            'definite': ["DEF", "INDEF"],
-            'tense': ["PERF", "IMPF", "IMPV"],
-            'participle': ["ACT", "PASS", "VN"],
-        }
-        for name, list_ in lists:
-            if prop in list_:
-                props.name=prop
+    # non-titled fields
+    if not title:
+        for name, list_ in lists.items():
+            if tag in list_:
+                segment_props[name.lower()], created = apps.get_model(app_label='quran', model_name=name) \
+                    .objects.get_or_create(pk=tag)
                 return
 
-    print("unknown header in: %", prop) # worst case - something left unresolved
+    print("unknown header in: %s" % prop)  # worst case - something left unresolved
 
 
 def test_data(verbosity):
     verbosity = int(verbosity)
-    print (verbosity)
+    print(verbosity)
     test_suite = unittest.TestLoader().loadTestsFromTestCase(DataIntegrityTestCase)
     unittest.TextTestRunner(verbosity=verbosity).run(test_suite)
 
@@ -179,7 +227,7 @@ class DataIntegrityTestCase(unittest.TestCase):
         sura = Sura.objects.get(number=sura_number)
         aya = sura.ayas.get(number=aya_number)
         word = aya.words.get(number=word_number)
-        self.assertEquals(word.token, buckwalter_to_unicode(expected_word))
+        self.assertEquals(word.text, get_unicode(expected_word))
 
     def test_first_ayas(self):
         """

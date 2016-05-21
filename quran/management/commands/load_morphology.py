@@ -1,23 +1,33 @@
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from quran.data import *
+from django.db import connection
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Load initial Quran data."
 
-    def handle_noargs(self, **options):
-        if Aya.objects.count() > 0:
-            print ('The quran database must be empty before running quran_loaddata. Running tests.')
-            test_data(verbosity=options['verbosity'])
-            return
+    def handle(self, **options):
 
-        print ("----- importing quran data (Tanzil) -----")
-        import_quran()
+        print("------ deleting words, segments, lemmas, roots, pos', moods, genders, forms, specials, cases, definites, tenses, participles, etc.")
+        cursor = connection.cursor()
+        cursor.execute('delete from quran_wordsegment')
+        cursor.execute('delete from quran_segment')
+        cursor.execute('delete from quran_word')
+        cursor.execute('delete from quran_lemma')
+        cursor.execute('delete from quran_root')
+        cursor.execute('delete from quran_pos')
+        cursor.execute('delete from quran_mood')
+        cursor.execute('delete from quran_gender')
+        cursor.execute('delete from quran_form')
+        cursor.execute('delete from quran_special')
+        cursor.execute('delete from quran_case')
+        cursor.execute('delete from quran_definite')
+        cursor.execute('delete from quran_tense')
+        cursor.execute('delete from quran_participle')
+        cursor.execute('delete from quran_other')
+        cursor.execute("select setval('quran.quran_word_id_seq', 1)")
 
-        print ("----- done importing quran data (Tanzil). starting translations -----")
-        import_translations()
-
-        print ("----- done importing translations. starting morphology -----")
         import_morphology()
+        print ("----- done importing morphology -----")
 
-        print ("----- done importing morphology. running tests -----")
-        test_data(verbosity=options['verbosity'])
+        # test_data(verbosity=options['verbosity'])
+

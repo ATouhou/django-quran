@@ -72,23 +72,23 @@ for u, bw in _unicode_to_buckwalter.items():
     _buckwalter_to_unicode[bw] = u
 
 
-def buckwalter_to_unicode(str):
+def get_unicode(buckwalter_str):
     """
-    >>> buckwalter_to_unicode('yaHoyaY`')
+    >>> get_unicode('yaHoyaY`')
     u'\u064a\u064e\u062d\u0652\u064a\u064e\u0649\u0670'
     """
-    ret = u""
-    for c in str:
-        ret += _buckwalter_to_unicode[c]
-    return ret
+    result = u""
+    for char in buckwalter_str:
+        result += _buckwalter_to_unicode[char]
+    return result
 
 
-def buckwalter(str):
+def get_buckwalter(unicode_str):
     """
-    >>> buckwalter(u'\u064a\u064e\u062d\u0652\u064a\u064e\u0649\u0670')
+    >>> get_buckwalter(u'\u064a\u064e\u062d\u0652\u064a\u064e\u0649\u0670')
     'yaHoyaY`'
     """
-    ret = ""
-    for c in str:
-        ret += _unicode_to_buckwalter[c]
-    return ret
+    result = ""
+    for char in unicode_str:
+        result += _unicode_to_buckwalter[char]
+    return result

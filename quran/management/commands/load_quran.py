@@ -1,10 +1,10 @@
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 from quran.data import *
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Load initial Quran data."
 
-    def handle_noargs(self, **options):
+    def handle(self, **options):
         if Aya.objects.count() > 0:
             print ('The quran database must be empty before running quran_loaddata. Running tests.')
             test_data(verbosity=options['verbosity'])
@@ -15,9 +15,3 @@ class Command(NoArgsCommand):
 
         print ("----- done importing quran data (Tanzil). starting translations -----")
         import_translations()
-
-        print ("----- done importing translations. starting morphology -----")
-        import_morphology()
-
-        print ("----- done importing morphology. running tests -----")
-        test_data(verbosity=options['verbosity'])
