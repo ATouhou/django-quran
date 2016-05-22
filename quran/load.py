@@ -17,21 +17,21 @@ def path_to(fn):
 
 @transaction.atomic
 def import_quran():
-    quran_data = parse(path_to('tanzil/quran-data.xml'))
-    quran = parse(path_to('tanzil/quran-uthmani.xml'))
+    quran_data = parse(path_to('data/tanzil/quran-data.xml'))
+    quran = parse(path_to('data/tanzil/quran-uthmani.xml'))
     sura_datas = quran_data.getElementsByTagName('sura')
 
     for sura_data in sura_datas:
         index = int(sura_data.getAttribute('index'))
         ayas = sura_data.getAttribute('ayas')
-        name = sura_data.getAttribute('name')
+        uname = sura_data.getAttribute('name')
         tname = sura_data.getAttribute('tname')
         ename = sura_data.getAttribute('ename')
         type_ = sura_data.getAttribute('type')
         order = int(sura_data.getAttribute('order'))
         rukus = int(sura_data.getAttribute('rukus'))
 
-        sura_model = Sura(number=index, name=name, tname=tname, ename=ename, type=type_, order=order, rukus=rukus, aya_number=ayas)
+        sura_model = Sura(number=index, utext=uname, ttext=tname, etext=ename, type=type_, order=order, rukus=rukus, aya_count=ayas)
 
         sura = quran.getElementsByTagName('sura')[index - 1]
         assert int(sura.getAttribute('index')) == sura_model.number
@@ -41,15 +41,15 @@ def import_quran():
         bismillah = ayas[0].getAttribute('bismillah')
         for aya in ayas:
             index = int(aya.getAttribute('index'))
-            text = aya.getAttribute('text')
-            aya_model = Aya(sura=sura_model, number=index, text=text, bismillah=bismillah)
+            utext = aya.getAttribute('text')
+            aya_model = Aya(sura=sura_model, number=index, utext=utext, bismillah=bismillah)
             aya_model.save()
-            print("%d:%d" % (sura_model.number, index))
+        print("Loaded sura: %d" % sura_model.number)
 
 
 @transaction.atomic
 def import_translation_txt(path_, translation):
-    print("Importing %s translation" % translation.name)
+    print("Importing %s translation" % translation.ttext)
     f = open(path_)
     ayas = Aya.objects.all()
     for aya in ayas:
@@ -57,25 +57,26 @@ def import_translation_txt(path_, translation):
         if len(line) <= 1:
             raise Exception('Translation file [%s] ended preemtively on aya %d:%d' % (path_, aya.sura_id, aya.number))
         line = line.strip()
-        t = AyaTranslation(sura=aya.sura, aya=aya, translation=translation, text=line)
+        t = AyaTranslation(sura=aya.sura, aya=aya, translation=translation, ttext=line)
         t.save()
-        print("[%s] %d:%d" % (translation.name, aya.sura_id, aya.number))
+        if aya.number == 1:
+            print("Loaded translation: [%s]     sura: %d" % (translation.ttext, aya.sura_id))
 
 
 def import_translations():
-    translator_data = open(path_to('zekr/translator_data.txt'))
+    translator_data = open(path_to('data/zekr/translator_data.txt'))
     for line in translator_data.readlines():
         name, translator, source_name, source_url, filename = line.strip().split(';')
-        translation = Translation(name=name, translator=translator, source_name=source_name, source_url=source_url)
+        translation = Translation(ttext=name, translator=translator, source_name=source_name, source_url=source_url)
         translation.save()
-        import_translation_txt(path_to('zekr/%s' % filename), translation)
+        import_translation_txt(path_to('data/zekr/%s' % filename), translation)
 
 
-def import_morphology():
+def import_morphology(test):
     sura = Sura.objects.get(number=2)
     aya = Aya.objects.get(sura=sura, number=2)  # any aya except the first.
     word = Word(number=-1)  # non existent word to begin with
-    f = open(path_to('corpus/quranic-corpus-morphology-0.4.txt'))
+    f = open(path_to('data/corpus/quranic-corpus-morphology-0.4.txt'))
 
     time_begin = time.time()
 
@@ -94,9 +95,12 @@ def import_morphology():
             line = f.readline()
             continue
 
+        if test and sura_number > 1:  # just do sura Fatiha if testing
+            break
+
         # print("%d.%d.%d.%d" % (sura_number, aya_number, word_number, segment_number))
 
-        text = parts[1]
+        ttext = parts[1]
         pos, created = Pos.objects.get_or_create(pk=parts[2])
         morphology = parts[3].split('|')
 
@@ -109,11 +113,16 @@ def import_morphology():
             word, created = Word.objects.get_or_create(sura=sura, aya=aya, number=word_number)
             # print ("[morphology] %d:%d" % (sura.number, aya.number))
 
-        lemma_text = None
-        root_text = None
+        if not word.ttext:
+            word.ttext = ttext
+        else:
+            word.ttext += ttext
+
+        lemma_ttext = None
+        root_ttext = None
         segment_props = {
             'pos': pos,
-            'text': text,
+            'ttext': ttext,
             'lemma': None,
             'mood': None,
             'gender': None,
@@ -140,25 +149,36 @@ def import_morphology():
         else:
             for prop in morphology:
                 if "LEM" in prop:
-                    lemma_text = prop[4:]  # stash because it has to be done with the root (if any)
+                    lemma_ttext = prop[4:]  # stash because it has to be done with the root (if any)
                 elif "ROOT" in prop:
-                    root_text = prop[5:]  # stash
+                    root_ttext = prop[5:]  # stash
                 else:
                     decorate_segment(segment_props, prop, segment_type)
 
-            if lemma_text:
+            if lemma_ttext:
                 root = None
-                if root_text:
-                    root, created = Root.objects.get_or_create(text=root_text)
-                segment_props['lemma'], created = Lemma.objects.get_or_create(text=lemma_text, root=root)
-            elif root_text:
-                print("root without lemma: %s" % root_text)
+                if root_ttext:
+                    root, created = Root.objects.get_or_create(ttext=root_ttext)
+                segment_props['lemma'], created = Lemma.objects.get_or_create(ttext=lemma_ttext, root=root)
+            elif root_ttext:
+                print("root without lemma: %s" % root_ttext)
 
         segment, created = Segment.objects.get_or_create(**segment_props)
         word_segment = WordSegment(word=word, number=segment_number, segment=segment, type=segment_type)
         word_segment.save()
-
+        word.utext = get_unicode(word.ttext)
+        word.save()  # to save word text
         line = f.readline()
+
+    roots = Root.objects.all()
+    for root in roots:
+        root.utext = get_unicode(root.ttext)
+        root.save()
+
+    lemmas = Lemma.objects.all()
+    for lemma in lemmas:
+        lemma.utext = get_unicode(lemma.ttext)
+        lemma.save()
 
 
 def decorate_segment(segment_props, prop, segment_type):
