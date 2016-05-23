@@ -7,7 +7,6 @@ from quran.models import *
 
 def index(request, template_name='quran/index.html'):
     suras = get_list_or_404(Sura)
-    import_morphology(False)
     return render_to_response(template_name, {'suras': suras})
 
 def get_sura(request, sura_number, translation=2, template_name='quran/sura.html'):
