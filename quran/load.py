@@ -1,4 +1,3 @@
-import unittest
 
 from datetime import timedelta
 import time
@@ -101,8 +100,9 @@ def import_morphology(test=False):
             line = f.readline()
             continue
 
-        if test and sura_number > 1:  # just do sura Fatiha if testing
-            break
+        if test and 2 < sura_number < 114:  # just do sura Fatiha if testing
+            line = f.readline()
+            continue
 
         # print("%d.%d.%d.%d" % (sura_number, aya_number, word_number, segment_number))
 
@@ -110,20 +110,18 @@ def import_morphology(test=False):
         pos, created = Pos.objects.get_or_create(pk=parts[2])
         morphology = parts[3].split('|')
 
-        if word_number is not word.number:
-            if aya_number is not aya.number:
-                if sura_number is not sura.number:
+        if word_number != word.number or aya_number != aya.number:
+            if aya_number != aya.number:
+                if sura_number != sura.number:
                     sura = Sura.objects.get(number=sura_number)
                     print("Sura: %d started,    Time passed: %s" % (sura_number, str(timedelta(seconds=time.time() - time_begin))))
                 aya = Aya.objects.get(sura=sura, number=aya_number)
-            if word.number >= 0:  # non initial word
+            if word.number != -1:  # non initial word
                 word.utext = get_unicode(word.ttext)
                 word.save()  # to save word text
             word, created = Word.objects.get_or_create(sura=sura, aya=aya, number=word_number)
-
-        if not word.ttext:
             word.ttext = ttext
-        else:
+        else: # same word, keep adding
             word.ttext += ttext
 
         lemma_ttext = None
@@ -251,45 +249,3 @@ def decorate_segment(segment_props, prop, segment_type):
 
     print("unknown header in: %s" % prop)  # worst case - something left unresolved
 
-
-def test_data(verbosity):
-    verbosity = int(verbosity)
-    print(verbosity)
-    test_suite = unittest.TestLoader().loadTestsFromTestCase(DataIntegrityTestCase)
-    unittest.TextTestRunner(verbosity=verbosity).run(test_suite)
-
-
-class DataIntegrityTestCase(unittest.TestCase):
-    def check_word(self, sura_number, aya_number, word_number, expected_word):
-        sura = Sura.objects.get(number=sura_number)
-        aya = sura.ayas.get(number=aya_number)
-        word = aya.words.get(number=word_number)
-        self.assertEquals(word.text, get_unicode(expected_word))
-
-    def test_first_ayas(self):
-        """
-        Test the first ayas of some suras
-        """
-        self.check_word(1, 1, 3, u'{lr~aHoma`ni')
-        self.check_word(2, 1, 1, u'Al^m^')
-        self.check_word(114, 1, 1, u'qulo')
-
-    def test_last_ayas(self):
-        """
-        Test the last ayas of some suras
-        """
-        self.check_word(1, 7, 2, u'{l~a*iyna')
-        self.check_word(2, 286, 49, u'{loka`firiyna')
-        self.check_word(114, 6, 3, u'wa{ln~aAsi')
-
-    def test_yusuf_ali(self):
-        """
-        Test some ayas against Yusuf Ali
-        """
-        sura_number = 112
-        aya_number = 4
-        sura = Sura.objects.get(number=sura_number)
-        aya = sura.ayas.get(number=aya_number)
-        translation = Translation.objects.get(name='Yusuf Ali')
-        t = aya.translations.get(translation=translation)
-        self.assertEquals(t.text, 'And there is none like unto Him.')

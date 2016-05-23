@@ -1,10 +1,13 @@
 from django.db.models import Prefetch
 from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response
+
+from quran.load import import_morphology
 from quran.models import *
 
 
 def index(request, template_name='quran/index.html'):
     suras = get_list_or_404(Sura)
+    import_morphology(False)
     return render_to_response(template_name, {'suras': suras})
 
 def get_sura(request, sura_number, translation=2, template_name='quran/sura.html'):
