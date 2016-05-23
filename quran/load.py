@@ -17,6 +17,7 @@ def path_to(fn):
 
 @transaction.atomic
 def import_quran():
+    print("----- importing quran -----")
     quran_data = parse(path_to('data/tanzil/quran-data.xml'))
     quran = parse(path_to('data/tanzil/quran-uthmani.xml'))
     sura_datas = quran_data.getElementsByTagName('sura')
@@ -38,10 +39,10 @@ def import_quran():
         sura_model.save()
 
         ayas = sura.getElementsByTagName('aya')
-        bismillah = ayas[0].getAttribute('bismillah')
         for aya in ayas:
             index = int(aya.getAttribute('index'))
             utext = aya.getAttribute('text')
+            bismillah = aya.getAttribute('bismillah')
             aya_model = Aya(sura=sura_model, number=index, utext=utext, bismillah=bismillah)
             aya_model.save()
         print("Loaded sura: %d" % sura_model.number)
@@ -64,6 +65,7 @@ def import_translation_txt(path_, translation):
 
 
 def import_translations():
+    print("----- importing translations -----")
     translator_data = open(path_to('data/zekr/translator_data.txt'))
     for line in translator_data.readlines():
         name, translator, source_name, source_url, filename = line.strip().split(';')
@@ -72,7 +74,11 @@ def import_translations():
         import_translation_txt(path_to('data/zekr/%s' % filename), translation)
 
 
-def import_morphology(test):
+def import_morphology(test=False):
+    """
+        some lemma's had trailing 2's which seemed to be bug, so in the below code they are removed
+    """
+    print("----- importing morphology -----")
     sura = Sura.objects.get(number=2)
     aya = Aya.objects.get(sura=sura, number=2)  # any aya except the first.
     word = Word(number=-1)  # non existent word to begin with
@@ -110,8 +116,10 @@ def import_morphology(test):
                     sura = Sura.objects.get(number=sura_number)
                     print("Sura: %d started,    Time passed: %s" % (sura_number, str(timedelta(seconds=time.time() - time_begin))))
                 aya = Aya.objects.get(sura=sura, number=aya_number)
+            if word.number >= 0:  # non initial word
+                word.utext = get_unicode(word.ttext)
+                word.save()  # to save word text
             word, created = Word.objects.get_or_create(sura=sura, aya=aya, number=word_number)
-            # print ("[morphology] %d:%d" % (sura.number, aya.number))
 
         if not word.ttext:
             word.ttext = ttext
@@ -119,6 +127,7 @@ def import_morphology(test):
             word.ttext += ttext
 
         lemma_ttext = None
+        lemma_meaning = None
         root_ttext = None
         segment_props = {
             'pos': pos,
@@ -133,7 +142,7 @@ def import_morphology(test):
             'tense': None,
             'participle': None,
             'other': None,
-            }
+        }
 
         segment_type = morphology[0].lower()  # prefix, stem, or suffix
         morphology = morphology[1:]
@@ -143,13 +152,20 @@ def import_morphology(test):
                 print("more than 1 tag in prefix: %s" % word)
             else:
                 if ':' in morphology[0]:
-                    morphology = morphology[0].split(':')[0] # take the part before ":", part after : repeats POS
+                    morphology = morphology[0].split(':')[0]  # take the part before ":", part after : repeats POS
                 prefix, created = Other.objects.get_or_create(pk=morphology[0], category='prefix')
                 segment_props['other'] = prefix
         else:
             for prop in morphology:
                 if "LEM" in prop:
                     lemma_ttext = prop[4:]  # stash because it has to be done with the root (if any)
+                    """
+                     homonyms: same spelling but different meanings, e.g., EaSaA عصا could mean both 'wand' and 'to rebel'.
+                     it  seems like to work around some uniqueness constraint they just put a 2 to the end of second such item
+                    """
+                    if '2' in lemma_ttext:
+                        lemma_ttext = lemma_ttext[0:-1]  # remove trailing 2 which seems to be bug
+                        lemma_meaning = 2
                 elif "ROOT" in prop:
                     root_ttext = prop[5:]  # stash
                 else:
@@ -159,16 +175,18 @@ def import_morphology(test):
                 root = None
                 if root_ttext:
                     root, created = Root.objects.get_or_create(ttext=root_ttext)
-                segment_props['lemma'], created = Lemma.objects.get_or_create(ttext=lemma_ttext, root=root)
+                segment_props['lemma'], created = Lemma.objects.get_or_create(ttext=lemma_ttext, root=root, meaning=lemma_meaning)
+                word.lemma = segment_props['lemma']
             elif root_ttext:
                 print("root without lemma: %s" % root_ttext)
 
         segment, created = Segment.objects.get_or_create(**segment_props)
         word_segment = WordSegment(word=word, number=segment_number, segment=segment, type=segment_type)
         word_segment.save()
-        word.utext = get_unicode(word.ttext)
-        word.save()  # to save word text
         line = f.readline()
+
+    word.utext = get_unicode(word.ttext)  # to save the last word
+    word.save()
 
     roots = Root.objects.all()
     for root in roots:

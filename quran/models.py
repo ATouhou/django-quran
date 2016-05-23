@@ -12,22 +12,23 @@ class QuranicToken(models.Model):
     class Meta:
         abstract = True
 
-    def id_str(self):  # to be overridden below
+    @property  # to access from templates
+    def key(self):  # to be overridden below
         return ""  # will be 1.1.1.1 for sura:1 aya:1 word:1 segment:1
 
-    @property  # to access from templates
+    @property
     def str(self):
         if self.ttext:
-            return self.id_str() + ' ' + self.ttext
+            return self.ttext
         else:
-            return self.id_str() + ' ' + get_buckwalter(self.utext)
+            return get_buckwalter(self.utext)
 
-    @property  # to access from templates
+    @property
     def unicode(self):
         if self.utext:
-            return self.id_str() + ' ' + self.utext
+            return self.utext
         else:
-            return self.id_str() + ' ' + get_unicode(self.ttext)
+            return get_unicode(self.ttext)
 
     @property
     def text(self):  # quranic tokens want to be displayed in arabic
@@ -65,7 +66,8 @@ class Sura(QuranicToken):
     def name(self):
         return self.utext
 
-    def id_str(self):
+    @property
+    def key(self):
         return str(self.number)
 
 
@@ -87,8 +89,9 @@ class Aya(QuranicToken):
     def get_absolute_url(self):
         return reverse('quran_aya', args=[str(self.sura_id), str(self.number)])
 
-    def id_str(self):
-        return self.sura.id_str() + '.' + str(self.number)
+    @property
+    def key(self):
+        return self.sura.key + '.' + str(self.number)
 
 
 class TranslationModel(models.Model):
@@ -129,10 +132,10 @@ class AyaTranslation(TranslationModel):
 
 class Word(QuranicToken):
     """Arabic word in the Quran"""
-
     sura = models.ForeignKey(Sura, related_name='words', db_index=True)
     aya = models.ForeignKey(Aya, related_name='words', db_index=True)
     number = models.IntegerField()
+    lemma = models.ForeignKey('Lemma', related_name='words', null=True, blank=True)
 
     class Meta:
         unique_together = ('aya', 'number')
@@ -141,8 +144,9 @@ class Word(QuranicToken):
     def get_absolute_url(self):
         return reverse('quran_word', args=[str(self.sura_id), str(self.aya.number), str(self.number)])
 
-    def id_str(self):
-        return self.aya.id_str() + '.' + str(self.number)
+    @property
+    def key(self):
+        return self.aya.key + '.' + str(self.number)
 
 
 class WordSegment(models.Model):
@@ -153,47 +157,11 @@ class WordSegment(models.Model):
     type = models.CharField(max_length=10)  # prefix, stem, suffix
 
 
-class QuranicSubToken(models.Model):
-    """
-    for segment, lemma, and root: have text in ascii instead of unicode
-    this is just like the QuranicToken, except ttext/utext must be defined in overriding classes due to custom usage, i.e., make them pk
-    """
-
-    class Meta:
-        abstract = True
-
-    @property  # to access from templates
-    def str(self):
-        if self.ttext:
-            return self.ttext
-        else:
-            return get_buckwalter(self.utext)
-
-    @property  # to access from templates
-    def unicode(self):
-        if self.utext:
-            return self.utext
-        else:
-            return get_unicode(self.ttext)
-
-    @property
-    def text(self):  # quranic tokens want to be displayed in arabic
-        return self.unicode
-
-    def __str__(self):
-        return self.str
-
-    def __unicode__(self):
-        return self.unicode
-
-
-class Segment(QuranicSubToken):
+class Segment(QuranicToken):
     """
     Morphological Segment(s) of a Word
     Segments are unique, so there are multiple segments in a word as well as multiple words that a segment go into
     """
-    ttext = models.CharField(max_length=50)  # cant be pk because there could be same text with different attributes
-    utext = models.CharField(max_length=50, blank=True, null=True)
     words = models.ManyToManyField(Word, related_name='segments', through=WordSegment)
     lemma = models.ForeignKey('Lemma', related_name='segments', db_index=True, null=True, blank=True)
     pos = models.ForeignKey('Pos', db_index=True, null=True, blank=True)
@@ -211,50 +179,52 @@ class Segment(QuranicSubToken):
         ordering = ['ttext']
 
 
-class Lemma(QuranicSubToken):
-    """ Distinct Arabic word (lemma) in the Quran """
-    ttext = models.CharField(max_length=50, primary_key=True)  # unicode arabic
-    utext = models.CharField(max_length=50, blank=True, null=True)
+class Lemma(QuranicToken):
+    """
+    Distinct Arabic word (lemma) in the Quran
+    homonyms: same spelling but different meanings, e.g., EaSaA عصا could mean both 'wand' and 'to rebel'.
+    it  seems like to work around some uniqueness constraint they just put a 2 to the end of second such item
+    in such cases we put a 2 in meaning field below, otherwise None; actual meanings maybe put here later on
+    """
     root = models.ForeignKey('Root', null=True, related_name='lemmas', db_index=True)
+    meaning = models.CharField(max_length=50, blank=True, null=True)
 
     class Meta:
         ordering = ['ttext']
 
     def get_absolute_url(self):
-        return reverse('quran_lemma', args=[self.ttext])
+        return reverse('quran_lemma', args=[self.id])
 
 
-class Root(QuranicSubToken):
+class Root(QuranicToken):
     """ Root word """
-    ttext = models.CharField(max_length=10, primary_key=True)  # to my knowledge, there is no root with more than 7 letters -idris
-    utext = models.CharField(max_length=50, blank=True, null=True)
 
     def get_absolute_url(self):
-        return reverse('quran_root', args=[self.ttext])
+        return reverse('quran_root', args=[self.id])
 
 
-class SegmentFeature(QuranicSubToken):
+class SegmentFeature(models.Model):
     """ abstract class to derive generic tables """
     ttext = models.CharField(max_length=10, primary_key=True)
     long_name = models.CharField(max_length=50)
 
     @property  # to access from templates
     def str(self):
-        return self.short_name
+        return self.ttext
 
     @property  # to access from templates
     def unicode(self):
-        return self.long_name + '(' + self.short_name + ')'
+        return self.long_name + '(' + self.ttext + ')'
 
     @property
     def text(self):  # morphological features shown in latin
-        return self.str()
+        return self.str
 
     def __str__(self):
-        return self.str()
+        return self.str
 
     def __unicode__(self):
-        return self.unicode()
+        return self.unicode
 
     class Meta:
         abstract = True
