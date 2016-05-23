@@ -1,11 +1,13 @@
+from django.db.models import Prefetch
 from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response
 from quran.models import *
+
 
 def index(request, template_name='quran/index.html'):
     suras = get_list_or_404(Sura)
     return render_to_response(template_name, {'suras': suras})
 
-def get_sura(request, sura_number, translation=1, template_name='quran/sura.html'):
+def get_sura(request, sura_number, translation=2, template_name='quran/sura.html'):
     sura = get_object_or_404(Sura, number=sura_number)
     ayas = sura.ayas.all()
     if translation:
@@ -13,7 +15,7 @@ def get_sura(request, sura_number, translation=1, template_name='quran/sura.html
         ayas = zip(ayas, translations)
     return render_to_response(template_name, {'sura': sura, 'ayas': ayas})
 
-def get_aya(request, sura_number, aya_number, translation=1, template_name='quran/aya.html'):
+def get_aya(request, sura_number, aya_number, translation=2, template_name='quran/aya.html'):
     sura = get_object_or_404(Sura, number=sura_number)
     aya = get_object_or_404(Aya, sura=sura, number=aya_number)
     translated_aya = get_object_or_404(AyaTranslation, aya=aya, translation=translation)
@@ -23,22 +25,21 @@ def get_aya(request, sura_number, aya_number, translation=1, template_name='qura
 def get_word(request, sura_number, aya_number, word_number, template_name='quran/word.html'):
     aya = get_object_or_404(Aya, sura=sura_number, number=aya_number)
     word = get_object_or_404(Word, aya=aya, number=word_number)
-    root = word.root
-    return render_to_response(template_name, {'word': word, 'aya': aya, 'root': root})
+    segments = word.segments.all()
+    return render_to_response(template_name, {'word': word, 'aya': aya, 'segments':segments})
 
-def get_lemma(request, lemma_id, template_name='quran/lemma.html'):
+def get_lemma(request, lemma_id, translation=2, template_name='quran/lemma.html'):
     lemma = get_object_or_404(Lemma, pk=lemma_id)
-    root = lemma.root
-    words = lemma.word_set.all()
-    ayas = lemma.ayas.distinct()
-    return render_to_response(template_name, {'lemma': lemma, 'root': root, 'words': words, 'ayas': ayas})
+    words = lemma.words.all()
+    ayas = Aya.objects.filter(words__lemma__id = lemma_id).distinct()
+    # todo: add translation
+    return render_to_response(template_name, {'lemma': lemma, 'words': words, 'ayas': ayas})
 
 def get_root(request, root_id, template_name='quran/root.html'):
-    root = get_object_or_404(Root, pk=root_id)
-    lemmas = root.lemmas.all()
-    ayas = root.ayas.distinct()
-    return render_to_response(template_name, {'root': root, 'lemmas': lemmas, 'ayas': ayas})
+    lemmas = Lemma.objects.filter(root__id=root_id).prefetch_related('words__aya')
+    # ayas = Aya.objects.filter(words__lemma__root__id=root_id).distinct()
+    return render_to_response(template_name, {'lemmas': lemmas})  # , 'ayas': ayas
 
 def root_index(request, template_name='quran/root_index.html'):
-    roots = Root.objects.all().order_by('letters')
+    roots = Root.objects.all().order_by('utext')
     return render_to_response(template_name, {'roots': roots})

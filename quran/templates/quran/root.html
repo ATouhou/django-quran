@@ -1,11 +1,11 @@
-{{ root }}
+Root: {{ lemmas.0.root.utext }}
 <hr>
 <ul>
     {% for lemma in lemmas %}
     <li>
-        <a href="{{ lemma.get_absolute_url }}">{{ lemma.token }}</a>
-        {% for aya in lemma.ayas.distinct %}
-        <div>{{ aya.sura_id }}:{{ aya.number }}. <span class="aya">{{ aya.text }}</span></div>
+        Lemma: <a href="{{ lemma.get_absolute_url }}" style="text-decoration: none">{{ lemma.utext }}</a>
+        {% for word in lemma.words.all.distinct|dictsort:"sura_id"|dictsort:"aya_id"%}
+        <div>{{ word.aya.key }}. <span class="aya">{{ word.aya.utext }}</span></div>
         {% endfor %}
     </li>
     {% endfor %}

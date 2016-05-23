@@ -1,7 +1,7 @@
 <ul>
     {% for root in roots %}
     <li>
-        <a href="{{ root.get_absolute_url }}">{{ root }}</a>
+        <a href="{{ root.get_absolute_url }}" style="text-decoration: none"> {{ root.utext }}</a>
     </li>
     {% endfor %}
 </ul>

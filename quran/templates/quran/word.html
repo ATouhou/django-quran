@@ -1,11 +1,14 @@
-{{ word.text }}
-<hr>
-Root:
-{% if root %}
-<a href="{{ root.get_absolute_url }}">{{ root }}</a>
-{% else %}
-Unknown
-{% endif %}
-<hr>
+Word: {{word.utext}}
 
-<div>{{ aya.sura_id }}:{{ aya.number }}. <span class="aya">{{ aya.text }}</span></div>
+{% if word.lemma %}
+| Lemma:
+<a href="{{ word.lemma.get_absolute_url }}">{{ word.lemma.utext }}</a>
+{% endif %}
+
+{% if word.lemma.root %}
+| Root:
+<a href="{{ word.lemma.root.get_absolute_url }}">{{ word.lemma.root.utext }}</a>
+{% endif %}
+
+<hr>
+<div><span class="aya">{{ aya.text }}</span></div>
