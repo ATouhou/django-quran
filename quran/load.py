@@ -197,6 +197,12 @@ def import_morphology(test=False):
         lemma.save()
 
 
+    segments = Segment.objects.all()
+    for segment in segments:
+        segment.utext = get_unicode(segment.ttext)
+        segment.save()
+
+
 def decorate_segment(segment_props, prop, segment_type):
     title = None
     skip = ["POS", "PCPL"]

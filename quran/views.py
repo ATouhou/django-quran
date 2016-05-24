@@ -24,11 +24,11 @@ def get_aya(request, sura_number, aya_number, translation=2, template_name='qura
     words = aya.words.all()
     return render_to_response(template_name, {'sura': sura, 'aya': aya, 'translation': translated_aya, 'words': words})
 
-def get_word(request, sura_number, aya_number, word_number, template_name='quran/word.html'):
+def get_word(request, sura_number, aya_number, word_number, translation=2, template_name='quran/word.html'):
     aya = get_object_or_404(Aya, sura=sura_number, number=aya_number)
-    word = get_object_or_404(Word, aya=aya, number=word_number)
-    segments = word.segments.all()
-    return render_to_response(template_name, {'word': word, 'aya': aya, 'segments':segments})
+    translated_aya = get_object_or_404(AyaTranslation, aya=aya, translation=translation)
+    word = Word.objects.filter(aya=aya, number=word_number).prefetch_related() # todo cant see extent of data brought
+    return render_to_response(template_name, {'word': word[0], 'aya': aya, 'translation': translated_aya})
 
 def get_lemma(request, lemma_id, translation=2, template_name='quran/lemma.html'):
     lemma = get_object_or_404(Lemma, pk=lemma_id)
@@ -39,7 +39,6 @@ def get_lemma(request, lemma_id, translation=2, template_name='quran/lemma.html'
 
 def get_root(request, root_id, template_name='quran/root.html'):
     lemmas = Lemma.objects.filter(root__id=root_id).prefetch_related('words__aya')
-    # ayas = Aya.objects.filter(words__lemma__root__id=root_id).distinct()
     return render_to_response(template_name, {'lemmas': lemmas})  # , 'ayas': ayas
 
 def root_index(request, template_name='quran/root_index.html'):

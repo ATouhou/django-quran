@@ -2,13 +2,62 @@ Word: {{word.utext}}
 
 {% if word.lemma %}
 | Lemma:
-<a href="{{ word.lemma.get_absolute_url }}">{{ word.lemma.utext }}</a>
+<a href="{{ word.lemma.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">{{ word.lemma.utext }}</a>
 {% endif %}
 
 {% if word.lemma.root %}
 | Root:
-<a href="{{ word.lemma.root.get_absolute_url }}">{{ word.lemma.root.utext }}</a>
+<a href="{{ word.lemma.root.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">{{ word.lemma.root.utext }}</a>
 {% endif %}
 
+{% for segment in word.segments.all %}
 <hr>
-<div><span class="aya">{{ aya.text }}</span></div>
+{{segment.utext}}
+
+{% if segment.pos %} | {{segment.pos}} {% endif %}
+{% if segment.mood %} | MOOD: {{segment.mood}} {% endif %}
+{% if segment.case %} | CASE: {{segment.case}} {% endif %}
+{% if segment.form %} | FORM: {{segment.form}} {% endif %}
+{% if segment.gender %} | GENDER: {{segment.gender}} {% endif %}
+{% if segment.definite %} | DEFINITE: {{segment.definite}} {% endif %}
+{% if segment.tense %} | TENSE: {{segment.tense}} {% endif %}
+{% if segment.participle %} | PARTICIPLE: {{segment.participle}} {% endif %}
+{% if segment.special %} | SP: {{segment.special}} {% endif %}
+{% if segment.other %} | OTHER: {{segment.other}} {% endif %}
+
+{% endfor %}
+
+<hr>
+
+<ul>
+    <li>
+        <p class="aya" data-sura="{{ aya.sura_id }}" data-aya="{{ aya.number }}">
+            {{aya.key}} {{ aya.text }}</p>
+        <p class="translation">{{ translation.text }}</p>
+    </li>
+</ul>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
+<script>
+    ayas = $('p.aya')
+    ayas.toArray().forEach(function (aya) {
+
+        sura_number = aya.attributes['data-sura'].value
+        aya_number = aya.attributes['data-aya'].value
+        old_html = aya.innerHTML
+        new_html = ''
+        words = old_html.split(' ')
+        key = words[0]
+        words = words.slice(1)
+
+        console.log(words)
+        words.forEach(function (word, index) {
+            if (index > 11)
+                new_html += '<a href="http://127.0.0.1:8080/quran/' + sura_number + '/' + aya_number + '/' + (index - 11) + '/" style="text-decoration:none; color:black" target="_blank">' + word + '</a> '
+            else if (index == 11)
+                new_html += word + ' '
+        })
+        aya.innerHTML = new_html
+    })
+</script>
