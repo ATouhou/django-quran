@@ -42,11 +42,13 @@ Word: <span style="color:red">{{word.utext}}</span>
 {% include "quran/aya_script_links.html" %}
 
 <hr>
-
-{% for aya in ayas %}
+Word {{word.utext}} in other verses:
+{% for ay in ayas %}
+{% if ay.key != aya.key %}
 <li>
-    {% include "quran/aya_template.html" with aya=aya %}
+    {% include "quran/aya_template.html" with aya=ay %}
 </li>
+{% endif %}
 {% endfor %}
 
 {% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select='span.aya' %}
