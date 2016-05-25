@@ -1,3 +1,6 @@
+{% extends 'quran/base.html' %}
+{% block body %}
+
 Lemma: {{ lemma.text }}
 
 {% if lemma.root %}
@@ -7,16 +10,18 @@ Root:
 
 <hr>
 <ul>
-    {% for w in words %}
+    {% for word in words %}
     <li>
-        <a href="{{ w.get_absolute_url }}" style="text-decoration: none">{{ w.text }}</a>
-        <div class="aya">{{ w.aya.key }}. {{ w.aya.text }}</div>
+        <a href="{{ word.get_absolute_url }}" style="text-decoration: none">
+            {{ word.text }}
+        </a>
+            {% include "quran/aya_template.html" with aya=word.aya %}
+            {% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select="#id"|add:word.aya.aya_id %}
+
     </li>
     {% endfor %}
 </ul>
 
-{% comment %}
-{% for aya in ayas %}
-<div> <span class="aya">{{ aya.text }}</span></div>
-{% endfor %}
-{% endcomment %}
+    {% include "quran/aya_script_links.html" %}
+
+{% endblock %}

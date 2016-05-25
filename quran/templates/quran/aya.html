@@ -1,9 +1,8 @@
-<div id="aya-{{ sura.number }}-{{ aya.number }}" class="quran aya">
-    {{ aya.text }}
-</div>
+{% extends 'quran/base.html' %}
 
-{% for word in words %}
-<a href="{{ word.get_absolute_url }}">{{ word.token }}</a>
-{% endfor %}
-
-<p class="translation">{{ translation.text }}</p>
+{% block body %}
+<li>
+    {% include "quran/aya_template.html" with aya=aya %}
+</li>
+{% include "quran/aya_script_links.html" with aya=aya%}
+{% endblock %}

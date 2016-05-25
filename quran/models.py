@@ -60,7 +60,7 @@ class Sura(QuranicToken):
         ordering = ['number']
 
     def get_absolute_url(self):
-        return reverse('quran_sura', args=[str(self.number)])
+        return reverse('quran_sura', args=[self.number])
 
     @property  # for backward compatibility - may be removed when not needed
     def name(self):
@@ -92,6 +92,10 @@ class Aya(QuranicToken):
     @property
     def key(self):
         return self.sura.key + '.' + str(self.number)
+
+    @property
+    def aya_id(self):
+        return 'id_' + str(self.sura_id) + '_' + str(self.number)
 
 
 class TranslationModel(models.Model):

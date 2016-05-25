@@ -1,0 +1,17 @@
+<script>
+    $(document).ready(function(){ // needs to be called after aya_script_links
+
+        ayas = $("{{highlight_select}}")
+        ayas.toArray().forEach(function (aya) {
+            html = aya.innerHTML
+            highlight_text = "{{highlight_text}}"
+
+            if (highlight_text.length) {
+                highlight_text_re = new RegExp(highlight_text, 'g')
+                html = html.replace(highlight_text_re, '<span style="color:red;">' + highlight_text + '</span>')
+                aya.innerHTML = html
+            }
+        })
+
+    })
+</script>

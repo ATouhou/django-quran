@@ -1,13 +1,20 @@
-Word: {{word.utext}}
+{% extends 'quran/base.html' %}
+{% block body %}
+
+Word: <span style="color:red">{{word.utext}}</span>
 
 {% if word.lemma %}
 | Lemma:
-<a href="{{ word.lemma.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">{{ word.lemma.utext }}</a>
+<a href="{{ word.lemma.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">
+    {{ word.lemma.utext }}
+</a>
 {% endif %}
 
 {% if word.lemma.root %}
 | Root:
-<a href="{{ word.lemma.root.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">{{ word.lemma.root.utext }}</a>
+<a href="{{ word.lemma.root.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">
+    {{ word.lemma.root.utext }}
+</a>
 {% endif %}
 
 {% for segment in word.segments.all %}
@@ -29,35 +36,10 @@ Word: {{word.utext}}
 
 <hr>
 
-<ul>
-    <li>
-        <p class="aya" data-sura="{{ aya.sura_id }}" data-aya="{{ aya.number }}">
-            {{aya.key}} {{ aya.text }}</p>
-        <p class="translation">{{ translation.text }}</p>
-    </li>
-</ul>
+<li>
+    {% include "quran/aya_template.html" with aya=aya %}
+</li>
+{% include "quran/aya_script_links.html" %}
+{% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select='span.aya' %}
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-
-<script>
-    ayas = $('p.aya')
-    ayas.toArray().forEach(function (aya) {
-
-        sura_number = aya.attributes['data-sura'].value
-        aya_number = aya.attributes['data-aya'].value
-        old_html = aya.innerHTML
-        new_html = ''
-        words = old_html.split(' ')
-        key = words[0]
-        words = words.slice(1)
-
-        console.log(words)
-        words.forEach(function (word, index) {
-            if (index > 11)
-                new_html += '<a href="http://127.0.0.1:8080/quran/' + sura_number + '/' + aya_number + '/' + (index - 11) + '/" style="text-decoration:none; color:black" target="_blank">' + word + '</a> '
-            else if (index == 11)
-                new_html += word + ' '
-        })
-        aya.innerHTML = new_html
-    })
-</script>
+{% endblock %}
