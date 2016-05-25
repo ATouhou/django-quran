@@ -11,4 +11,6 @@ urlpatterns = [
     url(r'^lemma/(?P<lemma_id>\d+)/$', views.get_lemma, name='quran_lemma'),
     url(r'^root/(?P<root_id>\d+)/$', views.get_root, name='quran_root'),
     url(r'^root/$', views.root_index, name='quran_root_list'),
+
+    url(r'^settings/$', views.settings, name='quran_settings')
 ]
