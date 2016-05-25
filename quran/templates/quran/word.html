@@ -40,6 +40,15 @@ Word: <span style="color:red">{{word.utext}}</span>
     {% include "quran/aya_template.html" with aya=aya %}
 </li>
 {% include "quran/aya_script_links.html" %}
+
+<hr>
+
+{% for aya in ayas %}
+<li>
+    {% include "quran/aya_template.html" with aya=aya %}
+</li>
+{% endfor %}
+
 {% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select='span.aya' %}
 
 {% endblock %}

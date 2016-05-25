@@ -24,18 +24,19 @@ def get_aya(request, sura_number, aya_number, translation_id=2, template_name='q
 
 
 def get_word(request, sura_number, aya_number, word_number, translation_id=2, template_name='quran/word.html'):
-    aya = Aya.objects.filter(sura__number=sura_number, number=aya_number).prefetch_related(
-        Prefetch('translations', queryset=AyaTranslation.objects.filter(translation=translation_id)))
+    aya = Aya.objects.filter(sura__number=sura_number, number=aya_number)\
+        .prefetch_related(Prefetch('translations', queryset=AyaTranslation.objects.filter(translation=translation_id)))
     word = Word.objects.filter(aya=aya, number=word_number).prefetch_related()  # todo cant see extent of data brought
-    return render_to_response(template_name, {'word': word[0], 'aya': aya[0]})
+    ayas = Aya.objects.filter(words__utext=word[0].utext)\
+        .order_by('sura_id', 'number')\
+        .prefetch_related(Prefetch('translations', queryset=AyaTranslation.objects.filter(translation=translation_id))) #  # other ayas with same word
+    return render_to_response(template_name, {'word': word[0], 'aya': aya[0], 'ayas': ayas })
 
 
 def get_lemma(request, lemma_id, translation=2, template_name='quran/lemma.html'):
     lemma = get_object_or_404(Lemma, pk=lemma_id)
-    words = lemma.words.all()
-    ayas = Aya.objects.filter(words__lemma__id=lemma_id).distinct()
-    # todo: add translation
-    return render_to_response(template_name, {'lemma': lemma, 'words': words, 'ayas': ayas})
+    words = lemma.words.all().select_related('aya')
+    return render_to_response(template_name, {'lemma': lemma, 'words': words})
 
 
 def get_root(request, root_id, template_name='quran/root.html'):
