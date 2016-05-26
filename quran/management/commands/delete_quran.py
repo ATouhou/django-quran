@@ -11,8 +11,8 @@ def delete_quran():
     cursor.execute('delete from postgres.quran.quran_translation')
     cursor.execute('delete from postgres.quran.quran_aya')
     cursor.execute('delete from postgres.quran.quran_sura')
-    cursor.execute("select setval('quran.quran_aya_id_seq', 1)")
-    cursor.execute("select setval('quran.quran_translation_id_seq', 1)")
+    cursor.execute("alter sequence quran.quran_aya_id_seq minvalue 1 start with 1 restart")
+    cursor.execute("alter sequence quran.quran_translation_id_seq minvalue 1 start with 1 restart")
 
 
 class Command(BaseCommand):

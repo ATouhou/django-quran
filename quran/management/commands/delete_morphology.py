@@ -21,9 +21,11 @@ def delete_morphology():
     cursor.execute('delete from postgres.quran.quran_tense')
     cursor.execute('delete from postgres.quran.quran_participle')
     cursor.execute('delete from postgres.quran.quran_other')
-    cursor.execute("select setval('quran.quran_word_id_seq', 1)")
-    cursor.execute("select setval('quran.quran_wordsegment_id_seq', 1)")
-    cursor.execute("select setval('quran.quran_segment_id_seq', 1)")
+    cursor.execute("alter sequence quran.quran_word_id_seq minvalue 1 start with 1 restart")
+    cursor.execute("alter sequence quran.quran_wordsegment_id_seq minvalue 1 start with 1 restart")
+    cursor.execute("alter sequence quran.quran_segment_id_seq minvalue 1 start with 1 restart")
+    cursor.execute("alter sequence quran.quran_lemma_id_seq minvalue 1 start with 1 restart")
+    cursor.execute("alter sequence quran.quran_root_id_seq minvalue 1 start with 1 restart")
 
 
 class Command(BaseCommand):

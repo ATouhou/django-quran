@@ -5,7 +5,7 @@ Lemma: {{ lemma.text }}
 
 {% if lemma.root %}
 Root:
-<a href="{{ lemma.root.get_absolute_url }}">{{ lemma.root.utext }}</a>
+<a href="{{ lemma.root.get_absolute_url }}" target="_blank">{{ lemma.root.utext }}</a>
 {% endif %}
 
 <hr>

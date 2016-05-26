@@ -73,7 +73,6 @@ class Sura(QuranicToken):
 
 class Aya(QuranicToken):
     """Aya (verse) of the Quran"""
-
     number = models.IntegerField(verbose_name='Aya Number')
     sura = models.ForeignKey(Sura, related_name='ayas', db_index=True)
     bismillah = models.CharField(max_length=50, blank=True, verbose_name='Bismillah')
