@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
-from quran.load import *
 from django.db import connection
+
+from quran.management.commands.delete_word_meanings import delete_word_meanings
 
 
 def delete_morphology():
@@ -32,4 +33,5 @@ class Command(BaseCommand):
     help = "Delete morphology data."
 
     def handle(self, *args, **options):
+        delete_word_meanings()
         delete_morphology()

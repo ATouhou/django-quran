@@ -67,6 +67,7 @@ _unicode_to_buckwalter = {
     u" ": " ",
 }
 
+
 _buckwalter_to_unicode = {}
 for u, bw in _unicode_to_buckwalter.items():
     _buckwalter_to_unicode[bw] = u

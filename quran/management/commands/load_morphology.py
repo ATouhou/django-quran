@@ -1,8 +1,10 @@
+import unittest
+
 from django.core.management.base import BaseCommand
 from quran.load import *
-from django.db import connection
 
 from quran.management.commands.delete_morphology import delete_morphology
+from quran.tests import TestMorphology
 
 
 class Command(BaseCommand):
@@ -16,5 +18,5 @@ class Command(BaseCommand):
         delete_morphology()
         import_morphology(options['t'])
 
-        # test_data(verbosity=options['verbosity'])
-
+        test_suite = unittest.TestLoader().loadTestsFromTestCase(TestMorphology)
+        unittest.TextTestRunner(verbosity=2).run(test_suite)
