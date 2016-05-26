@@ -139,6 +139,7 @@ class Word(QuranicToken):
     aya = models.ForeignKey(Aya, related_name='words', db_index=True)
     number = models.IntegerField()
     lemma = models.ForeignKey('Lemma', related_name='words', null=True, blank=True)
+    meaning = models.OneToOneField('WordMeaning', null=True)
 
     class Meta:
         unique_together = ('aya', 'number')
@@ -150,6 +151,15 @@ class Word(QuranicToken):
     @property
     def key(self):
         return self.aya.key + '.' + str(self.number)
+
+
+class WordMeaning(TranslationModel):
+    """ Word by word meaning in english"""
+    sura_number = models.IntegerField()  # id is the key for the one to one relation, numbers are for testing
+    aya_number = models.IntegerField()  # id is the key for the one to one relation, numbers are for testing
+    word_number = models.IntegerField()  # id is the key for the one to one relation, numbers are for testing
+    ttext = models.TextField()  # word meaning
+    utext = models.TextField()  # arabic
 
 
 class WordSegment(models.Model):

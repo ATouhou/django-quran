@@ -46,6 +46,18 @@ def import_quran():
             aya_model.save()
         print("Loaded sura: %d" % sura_model.number)
 
+    import_translations()
+
+
+def import_translations():
+    print("----- importing translations -----")
+    translator_data = open(path_to('data/zekr/translator_data.txt'))
+    for line in translator_data.readlines():
+        name, translator, source_name, source_url, filename = line.strip().split(';')
+        translation = Translation(ttext=name, translator=translator, source_name=source_name, source_url=source_url)
+        translation.save()
+        import_translation_txt(path_to('data/zekr/%s' % filename), translation)
+
 
 @transaction.atomic
 def import_translation_txt(path_, translation):
@@ -63,19 +75,45 @@ def import_translation_txt(path_, translation):
             print("Loaded translation: [%s]     sura: %d" % (translation.ttext, aya.sura_id))
 
 
-def import_translations():
-    print("----- importing translations -----")
-    translator_data = open(path_to('data/zekr/translator_data.txt'))
-    for line in translator_data.readlines():
-        name, translator, source_name, source_url, filename = line.strip().split(';')
-        translation = Translation(ttext=name, translator=translator, source_name=source_name, source_url=source_url)
-        translation.save()
-        import_translation_txt(path_to('data/zekr/%s' % filename), translation)
+def import_word_meanings():
+    """ word by word english meaning """
+    print("----- importing word meaning -----")
+    f = open(path_to('data/corpus/word_by_word_05_26_16.txt'))
+    sura_number = -1
+
+    line = f.readline()
+    while len(line) > 0:
+        parts = line.strip().split('\t')
+
+        try:
+            if int(parts[1]) > sura_number:
+                print('Importing word meanings of sura: ' + parts[1])
+            id = int(parts[0])
+            sura_number = int(parts[1])
+            aya_number = int(parts[2])
+            word_number = int(parts[3])
+            meaning = parts[4]
+            # part[5] is transliterating (not buckwalter) so ignore
+            utext = parts[6]
+
+        except ValueError:
+            line = f.readline()
+            continue
+
+        word_meaning = WordMeaning(id=id, sura_number=sura_number, aya_number=aya_number, word_number=word_number, utext=utext, ttext=meaning)
+        word_meaning.save()
+        line = f.readline()
+        continue
+
+    # all words have a meaning with same id
+    print("----- linking meanings to words -----")
+    for word in Word.objects.all():
+        word.meaning_id = word.id
+        word.save()
 
 
 def import_morphology(test=False):
     """
-        some lemma's had trailing 2's which seemed to be bug, so in the below code they are removed
     """
     print("----- importing morphology -----")
     sura = Sura.objects.get(number=2)
