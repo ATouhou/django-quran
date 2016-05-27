@@ -1,10 +1,19 @@
 <div>
-    <p class="aya">
-        <span class="key"> <a href="{{aya.get_absolute_url}}" style="text-decoration: none; color:black;">{{aya.key}} </a></span>
-        <span id="{{aya.aya_id}}" class="aya" data-aya="{{aya.number}}" data-sura="{{aya.sura.number}}"> {{aya.text}} </span>
+    {% if show_bismillah and aya.bismillah %}
+    <hr>
+    <p align="center">
+    {{ aya.bismillah }}
     </p>
-    <p class="translation">
-        {{ aya.translations.all.0.text }}
-    </p>
-    {{aya.word_meanings_json|safe}}
+    {% endif %}
+
+    <li>
+        <p class="aya">
+            <span class="key"> <a href="{{aya.get_absolute_url}}" style="text-decoration: none; color:black;">{{aya.key}} </a></span>
+            <span id="{{aya.aya_id}}" class="aya" data-aya="{{aya.number}}" data-sura="{{aya.sura.number}}"> {{aya.text}} </span>
+        </p>
+        <p class="translation">
+            {{ aya.translations.all.0.text }}
+        </p>
+        {{aya.word_meanings_json|safe}}
+    </li>
 </div>

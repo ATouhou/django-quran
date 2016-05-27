@@ -3,9 +3,7 @@
 {% block body %}
 <ul>
     {% for aya in ayas %}
-    <li>
-        {% include "quran/aya_template.html" with aya=aya %}
-    </li>
+        {% include "quran/aya_template.html" with aya=aya show_bismillah=True %}
     {% endfor %}
     {% include "quran/aya_script_links.html" %}
 </ul>

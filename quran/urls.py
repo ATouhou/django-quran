@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'^(?P<sura_number>\d+)/(?P<aya_number>\d+)/$', views.get_aya, name='quran_aya'),
     url(r'^(?P<sura_number>\d+)/(?P<aya_number>\d+)/(?P<word_number>\d+)/$', views.get_word, name='quran_word'),
 
+    url(r'^page/(?P<page_number>\d+)/$', views.get_page, name='quran_page'),
+
     url(r'^lemma/(?P<lemma_id>\d+)/$', views.get_lemma, name='quran_lemma'),
     url(r'^root/(?P<root_id>\d+)/$', views.get_root, name='quran_root'),
     url(r'^root/$', views.root_index, name='quran_root_list'),

@@ -10,8 +10,17 @@ def index(request, template_name='quran/index.html'):
 
 
 def get_sura(request, sura_number, template_name='quran/sura.html'):
-    ayas = Aya.objects.filter(sura__number=sura_number).prefetch_related(prefetch_aya_translations(request))
+    ayas = Aya.objects.filter(sura__number=sura_number)\
+        .prefetch_related(prefetch_aya_translations(request))
     return render_to_response(template_name, {'ayas': ayas})
+
+
+def get_page(request, page_number, template_name='quran/sura.html'):
+    page = Page.objects.get(number=page_number)
+    ayas = Aya.objects.filter(id__gte=page.aya_begin_id, id__lte=page.aya_end_id)\
+        .prefetch_related(prefetch_aya_translations(request))
+    return render_to_response(template_name, {'ayas': ayas})
+
 
 
 def get_aya(request, sura_number, aya_number, template_name='quran/aya.html'):
@@ -68,3 +77,5 @@ def get_translation_id(request):
 def prefetch_aya_translations(request):
     translation_id = get_translation_id(request)
     return Prefetch('translations', queryset=AyaTranslation.objects.filter(translation_id=translation_id))
+
+

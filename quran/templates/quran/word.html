@@ -36,9 +36,7 @@ Word: <span style="color:red">{{word.utext}}</span>
 
 <hr>
 
-<li>
-    {% include "quran/aya_template.html" with aya=aya %}
-</li>
+{% include "quran/aya_template.html" with aya=aya %}
 
 <hr>
 {% if ayas.count > 1 %}
@@ -49,9 +47,7 @@ No other verses with word {{word.utext}}
 
 {% for ay in ayas %}
 {% if ay.key != aya.key %}
-<li>
     {% include "quran/aya_template.html" with aya=ay %}
-</li>
 {% endif %}
 {% endfor %}
 
