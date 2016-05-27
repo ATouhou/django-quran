@@ -96,6 +96,11 @@ class Aya(QuranicToken):
     def aya_id(self):
         return 'id_' + str(self.sura_id) + '_' + str(self.number)
 
+    @property
+    def word_meanings_json(self):
+        meanings=list(self.word_meanings.all().order_by('number').values_list('ttext', flat=True))
+        return '<script>word_meanings["' + self.aya_id + '"]=["' + '", "'.join(meanings) + '"]</script>'
+
 
 class TranslationModel(models.Model):
     """ parent class of below Translation and AyaTranslation"""
@@ -155,11 +160,10 @@ class Word(QuranicToken):
 
 class WordMeaning(TranslationModel):
     """ Word by word meaning in english"""
-    sura_number = models.IntegerField()  # id is the key for the one to one relation, numbers are for testing
-    aya_number = models.IntegerField()  # id is the key for the one to one relation, numbers are for testing
-    word_number = models.IntegerField()  # id is the key for the one to one relation, numbers are for testing
+    sura = models.ForeignKey(Sura, related_name='word_meanings', db_index=True)
+    aya = models.ForeignKey(Aya, related_name='word_meanings', db_index=True)
+    number = models.IntegerField()  # id is the key for the one to one relation, numbers are for testing
     ttext = models.TextField()  # word meaning
-    utext = models.TextField()  # arabic
 
 
 class WordSegment(models.Model):

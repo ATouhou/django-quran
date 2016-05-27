@@ -62,7 +62,7 @@ def get_translation_id(request):
     if 'translation' in request.session:
         return request.session['translation']
     else:
-        return 2
+        return 1
 
 
 def prefetch_aya_translations(request):

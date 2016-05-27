@@ -171,10 +171,8 @@ class TestMorphology(unittest.TestCase):
 class TestWordMeanings(unittest.TestCase):
     def check_by_id(self, id):
         word = Word.objects.get(id=id)
-        self.assertEquals(word.utext, word.meaning.utext)
-        self.assertEquals(word.sura_id, word.meaning.sura_number)
-        self.assertEquals(word.aya.number, word.meaning.aya_number)
-        self.assertEquals(word.number, word.meaning.word_number)
+        self.assertEquals(word.sura_id, word.meaning.sura_id)
+        self.assertEquals(word.number, word.meaning.number)
 
 
     # these words are hand picked, due to different diacritics they dont all work

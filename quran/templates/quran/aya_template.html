@@ -1,5 +1,10 @@
+<div>
     <p class="aya">
         <span class="key"> <a href="{{aya.get_absolute_url}}" style="text-decoration: none; color:black;">{{aya.key}} </a></span>
         <span id="{{aya.aya_id}}" class="aya" data-aya="{{aya.number}}" data-sura="{{aya.sura.number}}"> {{aya.text}} </span>
     </p>
-    <p class="translation">{{ aya.translations.all.0.text }}</p>
+    <p class="translation">
+        {{ aya.translations.all.0.text }}
+    </p>
+    {{aya.word_meanings_json|safe}}
+</div>

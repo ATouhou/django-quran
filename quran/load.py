@@ -1,9 +1,11 @@
 
 from datetime import timedelta
 import time
+
+from django.db.models import F
 from os import path
 from xml.dom.minidom import parse
-from django.db import transaction
+from django.db import transaction, connection
 from django.apps import apps
 
 from quran.models import *
@@ -90,26 +92,40 @@ def import_word_meanings():
                 print('Importing word meanings of sura: ' + parts[1])
             id = int(parts[0])
             sura_number = int(parts[1])
-            aya_number = int(parts[2])
+            # aya_number = int(parts[2]) # not needed, will use aya_id from word object below
             word_number = int(parts[3])
             meaning = parts[4]
-            # part[5] is transliterating (not buckwalter) so ignore
-            utext = parts[6]
+            # part[5] # not need, transliteration (not buckwalter)
+            # utext = parts[6] # not needed, arabic script
 
         except ValueError:
             line = f.readline()
             continue
 
-        word_meaning = WordMeaning(id=id, sura_number=sura_number, aya_number=aya_number, word_number=word_number, utext=utext, ttext=meaning)
+        word_meaning = WordMeaning(
+            id=id,
+            sura_id=sura_number,
+            aya_id=1, # temporarily, reset below
+            number=word_number,
+            ttext=meaning
+        )
         word_meaning.save()
         line = f.readline()
         continue
 
     # all words have a meaning with same id
     print("----- linking meanings to words -----")
-    for word in Word.objects.all():
-        word.meaning_id = word.id
-        word.save()
+    Word.objects.all().update(meaning_id=F('id'))
+    # cant do '__' join in bulk update
+    cursor = connection.cursor()
+    cursor.execute("""update quran.quran_wordmeaning wm
+                    set aya_id = w.aya_id
+                    from quran.quran_word w
+                    where wm.id = w.id """)
+    # for word in Word.objects.all():
+    #     word.meaning.aya = word.aya
+    #     word.meaning.save()
+    cursor.execute("""update quran.quran_wordmeaning set ttext=replace(ttext, '"', '\"')""") # escape " characters, prevent bug in json
 
 
 def import_morphology(test=False):

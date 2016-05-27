@@ -39,10 +39,14 @@ Word: <span style="color:red">{{word.utext}}</span>
 <li>
     {% include "quran/aya_template.html" with aya=aya %}
 </li>
-{% include "quran/aya_script_links.html" %}
 
 <hr>
+{% if ayas.count > 1 %}
 Word {{word.utext}} in other verses:
+{% else %}
+No other verses with word {{word.utext}}
+{% endif %}
+
 {% for ay in ayas %}
 {% if ay.key != aya.key %}
 <li>
@@ -52,5 +56,6 @@ Word {{word.utext}} in other verses:
 {% endfor %}
 
 {% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select='span.aya' %}
+{% include "quran/aya_script_links.html" %}
 
 {% endblock %}
