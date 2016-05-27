@@ -2,8 +2,8 @@ import unittest
 import doctest
 from django.test import TestCase
 from quran import buckwalter
-from quran.buckwalter import get_unicode
-from quran.models import Word, AyaTranslation, Segment, WordMeaning
+from quran.buckwalter import get_unicode, get_buckwalter
+from quran.models import Word, AyaTranslation, Segment, WordMeaning, Aya
 
 
 class BuckwalterTest(TestCase):
@@ -14,30 +14,22 @@ class BuckwalterTest(TestCase):
         doctest.testmod(buckwalter)
 
 
-def get_word(sura_number, aya_number, word_number):
-    return Word.objects \
-        .filter(number=word_number) \
-        .filter(sura__number=sura_number) \
-        .filter(aya__number=aya_number)
-
-
-def check_word(self, sura_number, aya_number, word_number, expected_word):
-    word = get_word(sura_number, aya_number, word_number)
-    self.assertEquals(word.__len__(), 1)
-    self.assertEquals(word[0].text, get_unicode(expected_word))
-
-
 class TestQuran(unittest.TestCase):
-    def test_words(self):
-        # Test the first ayas of some suras
-        check_word(self, 1, 1, 3, '{lr~aHoma`ni')
-        check_word(self, 2, 1, 1, 'Al^m^')
-        check_word(self, 114, 1, 1, 'qulo')
+    def get_aya(self, sura_number, aya_number):
+        return Aya.objects \
+            .filter(number=aya_number) \
+            .filter(sura__number=sura_number) \
 
-        # Test the last ayas of some suras
-        check_word(self, 1, 7, 2, '{l~a*iyna')
-        check_word(self, 2, 286, 49, '{loka`firiyna')
-        check_word(self, 114, 6, 3, 'wa{ln~aAsi')
+    def check_aya(self, sura_number, aya_number, expected_aya):
+        aya = self.get_aya(sura_number, aya_number)
+        self.assertEquals(aya.__len__(), 1)
+        self.assertEquals(aya[0].text, expected_aya)
+
+    def test_ayas(self):
+        # Test the first ayas of some suras
+        # Due to diacritic differences, not all ayas pass, these are hand picked
+        self.check_aya(2, 28, u'كَيْفَ تَكْفُرُونَ بِٱللَّهِ وَكُنتُمْ أَمْوَٰتًا فَأَحْيَٰكُمْ ثُمَّ يُمِيتُكُمْ ثُمَّ يُحْيِيكُمْ ثُمَّ إِلَيْهِ تُرْجَعُونَ')
+        self.check_aya(114, 1, u'قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ')
 
     def test_yusuf_ali(self):
         """
@@ -54,15 +46,37 @@ class TestQuran(unittest.TestCase):
 
 
 class TestMorphology(unittest.TestCase):
+    def get_word(self, sura_number, aya_number, word_number):
+        return Word.objects \
+            .filter(number=word_number) \
+            .filter(sura__number=sura_number) \
+            .filter(aya__number=aya_number)
+
+    def check_word(self, sura_number, aya_number, word_number, expected_word):
+        word = self.get_word(sura_number, aya_number, word_number)
+        self.assertEquals(word.__len__(), 1)
+        self.assertEquals(word[0].text, get_unicode(expected_word))
+
+    def test_words(self):
+        # Test the first ayas of some suras
+        self.check_word(1, 1, 3, '{lr~aHoma`ni')
+        self.check_word(2, 1, 1, 'Al^m^')
+        self.check_word(114, 1, 1, 'qulo')
+
+        # Test the last ayas of some suras
+        self.check_word(1, 7, 2, '{l~a*iyna')
+        self.check_word(2, 286, 49, '{loka`firiyna')
+        self.check_word(114, 6, 3, 'wa{ln~aAsi')
+
     def check_lemma(self, sura_number, aya_number, word_number, expected_lemma):
-        word = get_word(sura_number, aya_number, word_number)
+        word = self.get_word(sura_number, aya_number, word_number)
         if expected_lemma == '':
             self.assertIsNone(word[0].lemma)
         else:
             self.assertEquals(word[0].lemma.text, get_unicode(expected_lemma))
 
     def check_root(self, sura_number, aya_number, word_number, expected_root):
-        word = get_word(sura_number, aya_number, word_number)
+        word = self.get_word(sura_number, aya_number, word_number)
         if expected_root == '':
             if word[0].lemma:
                 self.assertIsNone(word[0].lemma.root)

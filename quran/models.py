@@ -102,6 +102,12 @@ class Aya(QuranicToken):
         return '<script>word_meanings["' + self.aya_id + '"]=["' + '", "'.join(meanings) + '"]</script>'
 
 
+class Page(models.Model):
+    number = models.IntegerField()
+    aya_begin = models.ForeignKey(Aya, related_name='+')
+    aya_end = models.ForeignKey(Aya, related_name='+')
+
+
 class TranslationModel(models.Model):
     """ parent class of below Translation and AyaTranslation"""
     class Meta:

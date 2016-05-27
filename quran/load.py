@@ -48,6 +48,26 @@ def import_quran():
             aya_model.save()
         print("Loaded sura: %d" % sura_model.number)
 
+    page_datas = quran_data.getElementsByTagName('page')
+    index = int(page_datas[0].getAttribute('index'))
+    sura_number = page_datas[0].getAttribute('sura')
+    aya_number = page_datas[0].getAttribute('aya')
+    aya = Aya.objects.get(sura_id=sura_number, number=aya_number)
+    page = Page(number=index, aya_begin=aya)
+    for page_data in page_datas[1:]:
+        index = int(page_data.getAttribute('index'))
+        sura_number = page_data.getAttribute('sura')
+        aya_number = page_data.getAttribute('aya')
+        aya = Aya.objects.get(sura_id=sura_number, number=aya_number)
+        page.aya_end_id = aya.id - 1  # set and save previous page
+        page.save()
+        page = Page(number=index, aya_begin=aya)  # start a new page
+
+    # set and save the last page
+    aya = Aya.objects.last()
+    page.aya_end = aya
+    page.save()
+
     import_translations()
 
 
