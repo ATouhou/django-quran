@@ -1,0 +1,44 @@
+{% extends 'quran/base.html' %}
+
+{% block body %}
+
+{% load quran %}
+<div style="border:solid 1px; width:550px;">
+    <div style="border:solid 5px #BA5428;">
+        <div style="border:solid 1px;">
+            <div style="border: 10px solid #d8c397;">
+                <div style="border:solid 1px; padding: 3px;">
+                    <div style="border:solid 1px; padding: 10px;" class="page">
+                        {% for aya in ayas %}
+                        {% if aya.bismillah %}
+                        <div class="header">
+سورة {{aya.sura.text}}
+                        </div>
+                        <div class="bismillah" style="text-align: center;">
+                            {{ aya.bismillah }}
+                        </div>
+                        {% endif %}
+
+                        <span id="{{aya.aya_id}}" class="aya" data-aya="{{aya.number}}" data-sura="{{aya.sura.number}}">
+                            {{aya.text}}
+                        </span>
+
+                        <span class="key" title="{{aya.translations.all.0.text}}" style="display: inline-block; font-size: .7em;">
+                            <a href="{{aya.get_absolute_url}}" class="aya_numerals">
+                                ﴿{{aya.number|arabic_numerals}}﴾
+                            </a>
+                        </span>
+
+                        {{aya.word_meanings_json|safe}}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "quran/aya_script_links.html" %}
+
+{% endblock %}
+

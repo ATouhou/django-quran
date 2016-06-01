@@ -1,0 +1,31 @@
+
+a.word {
+    text-decoration: none;
+    color: black
+}
+
+a.word:hover {
+    background: rgba(105, 215, 40, 0.22)
+}
+
+div.page {
+    text-align: justify;
+    font-family: 'Traditional Arabic';
+    font-size: 2em;
+    font-weight: normal;
+    direction: rtl;
+}
+
+span.key a.aya_numerals {
+    text-decoration: none;
+    color: gray;
+}
+
+div.page div.header {
+    height: 1.5em;
+    background: url('/static/quran/header.svg') no-repeat center center;
+    background-size: 100%;
+    text-align: center;
+    padding: 1em;
+    font-size: 0.8em
+}
