@@ -149,7 +149,7 @@ def import_word_meanings():
     # for word in Word.objects.all():
     #     word.meaning.aya = word.aya
     #     word.meaning.save()
-    cursor.execute("""update quran.quran_wordmeaning set ttext=replace(ttext, '"', '\"')""") # escape " characters, prevent bug in json
+    cursor.execute("""update quran.quran_wordmeaning set ttext=replace(ttext, '"', '\\"')""") # escape " characters, prevent bug in json
 
 
 def import_morphology(test=False):
