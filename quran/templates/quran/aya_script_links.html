@@ -16,7 +16,7 @@
         words.forEach(function (word, index) {
                 new_html += '<a href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index+1) + '/" ' +
                         'title="' + meanings[index] + '"' +
-                        'style="text-decoration:none; color:black" target="_blank">' + word + '</a> '
+                        'target="_blank" class="word">' + word + '</a> '
         })
 
         aya.innerHTML  = new_html

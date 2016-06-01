@@ -68,6 +68,10 @@ def import_quran():
     page.aya_end = aya
     page.save()
 
+    aya = Aya.objects.get(sura_id=1, number=1)
+    aya.bismillah = ' '  # just to show the sura header for sura fatiha
+    aya.save()
+
     import_translations()
 
 

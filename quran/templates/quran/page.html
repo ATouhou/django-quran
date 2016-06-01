@@ -3,12 +3,12 @@
 {% block body %}
 
 {% load quran %}
-<div style="border:solid 1px; width:550px;">
-    <div style="border:solid 5px #BA5428;">
-        <div style="border:solid 1px;">
-            <div style="border: 10px solid #d8c397;">
-                <div style="border:solid 1px; padding: 3px;">
-                    <div style="border:solid 1px; padding: 10px;" class="page">
+<div class="wire_frame page_container">
+    <div class="outer_frame">
+        <div class="wire_frame">
+            <div class="inner_frame">
+                <div class="wire_frame" style="padding: 3px;">
+                    <div class="page wire_frame" style="padding: 10px;">
                         {% for aya in ayas %}
                         {% if aya.bismillah %}
                         <div class="header">
@@ -23,7 +23,7 @@
                             {{aya.text}}
                         </span>
 
-                        <span class="key" title="{{aya.translations.all.0.text}}" style="display: inline-block; font-size: .7em;">
+                        <span class="key" title="{{aya.translations.all.0.text}}" style="display:inline-block;">
                             <a href="{{aya.get_absolute_url}}" class="aya_numerals">
                                 ﴿{{aya.number|arabic_numerals}}﴾
                             </a>

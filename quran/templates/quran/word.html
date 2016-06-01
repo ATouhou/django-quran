@@ -1,18 +1,18 @@
 {% extends 'quran/base.html' %}
 {% block body %}
 
-Word: <span style="color:red">{{word.utext}}</span>
+Word: <span class="highlighted_word">{{word.utext}}</span>
 
 {% if word.lemma %}
 | Lemma:
-<a href="{{ word.lemma.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">
+<a href="{{ word.lemma.get_absolute_url }}" class="blank_link" target="_blank">
     {{ word.lemma.utext }}
 </a>
 {% endif %}
 
 {% if word.lemma.root %}
 | Root:
-<a href="{{ word.lemma.root.get_absolute_url }}" style="text-decoration: none; color:black" target="_blank">
+<a href="{{ word.lemma.root.get_absolute_url }}" class="blank_link" target="_blank">
     {{ word.lemma.root.utext }}
 </a>
 {% endif %}

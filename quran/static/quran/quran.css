@@ -14,18 +14,55 @@ div.page {
     font-size: 2em;
     font-weight: normal;
     direction: rtl;
+    background-color: rgba(252, 250, 248, 0.64);
 }
 
 span.key a.aya_numerals {
     text-decoration: none;
     color: gray;
+    font-size: .7em;
 }
 
 div.page div.header {
     height: 1.5em;
-    background: url('/static/quran/header.svg') no-repeat center center;
+    background: url('/static/quran/header_contrasted.svg') no-repeat center center;
     background-size: 100%;
     text-align: center;
     padding: 1em;
     font-size: 0.8em
+}
+
+div.page_container {
+    width:550px;
+}
+
+.wire_frame {
+    border: 1px solid
+}
+
+.outer_frame {
+    border:solid 5px #BA5428;
+}
+
+.inner_frame {
+    border: 10px solid #d8c397;
+}
+
+a.blank_link {
+    text-decoration: none;
+    color:black;
+}
+
+p.aya {
+    font-family:'Traditional Arabic';
+    font-size: 2em
+}
+
+p.aya span.key {
+    font-size: 0.66em;
+}
+
+.highlighted_word {
+    background-color: cornsilk;
+    color:crimson;
 }
