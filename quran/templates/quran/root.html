@@ -8,7 +8,7 @@ Root: {{ lemmas.0.root.utext }}
     <li>
         Lemma: <a href="{{ lemma.get_absolute_url }}" style="text-decoration: none">{{ lemma.utext }}</a>
         {% for word in lemma.words.all.distinct|dictsort:"sura_id"|dictsort:"aya_id" %}
-        {% include 'quran/aya_template.html' with aya=word.aya %}
+        {% include 'quran/aya_p.html' with aya=word.aya %}
         {% include 'quran/aya_script_highlight.html' with highlight_text=word.utext highlight_select="#"|add:word.aya.aya_id %}
         {% endfor %}
     </li>

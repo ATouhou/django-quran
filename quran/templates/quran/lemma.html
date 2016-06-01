@@ -16,7 +16,7 @@ Root:
         <a href="{{ word.get_absolute_url }}" style="text-decoration: none">
             {{ word.text }}
         </a>
-            {% include "quran/aya_template.html" with aya=word.aya %}
+            {% include "quran/aya_p.html" with aya=word.aya %}
             {% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select="#id"|add:word.aya.aya_id %}
 
     </li>

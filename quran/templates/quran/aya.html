@@ -1,8 +1,6 @@
 {% extends 'quran/base.html' %}
 
 {% block body %}
-<li>
-    {% include "quran/aya_template.html" with aya=aya %}
-</li>
+{% include "quran/aya_p.html" with aya=aya %}
 {% include "quran/aya_script_links.html" with aya=aya%}
 {% endblock %}

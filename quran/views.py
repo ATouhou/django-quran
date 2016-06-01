@@ -15,7 +15,7 @@ def get_sura(request, sura_number, template_name='quran/sura.html'):
     return render_to_response(template_name, {'ayas': ayas})
 
 
-def get_page(request, page_number, template_name='quran/sura.html'):
+def get_page(request, page_number, template_name='quran/page.html'):
     page = Page.objects.get(number=page_number)
     ayas = Aya.objects.filter(id__gte=page.aya_begin_id, id__lte=page.aya_end_id)\
         .prefetch_related(prefetch_aya_translations(request))
