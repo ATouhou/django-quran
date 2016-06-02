@@ -1,5 +1,15 @@
-<ol>
-    {% for sura in suras %}
-    <li><a href="{{ sura.get_absolute_url }}" class="blank_link">{{ sura.name }}</a></li>
-    {% endfor %}
-</ol>
+{% extends 'quran/base.html' %}
+
+{% block body %}
+<div id="index">
+    <ol>
+        {% for sura in suras %}
+        <li>
+            <a href="{{ sura.get_absolute_url }}" class="blank_link">
+                {{ sura.name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ol>
+</div>
+{% endblock %}

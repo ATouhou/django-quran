@@ -66,3 +66,8 @@ p.aya span.key {
     background-color: cornsilk;
     color:crimson;
 }
+
+div#index {
+    margin-left: 50px;
+    font-size: 2em;
+}
