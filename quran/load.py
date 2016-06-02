@@ -110,7 +110,6 @@ def import_word_meanings():
     line = f.readline()
     while len(line) > 0:
         parts = line.strip().split('\t')
-
         try:
             if int(parts[1]) > sura_number:
                 print('Importing word meanings of sura: ' + parts[1])
@@ -121,7 +120,6 @@ def import_word_meanings():
             meaning = parts[4]
             # part[5] # not need, transliteration (not buckwalter)
             # utext = parts[6] # not needed, arabic script
-
         except ValueError:
             line = f.readline()
             continue
@@ -152,6 +150,25 @@ def import_word_meanings():
     cursor.execute("""update quran.quran_wordmeaning set ttext=replace(ttext, '"', '\\"')""") # escape " characters, prevent bug in json
 
 
+def generate_distinct_words():
+    print("----- generating distinct words -----")
+    time_begin = time.time()
+    words = Word.objects.order_by('sura_id', 'aya_id', 'number').all()
+    for word in words:
+        distinct_word, created = DistinctWord.objects.get_or_create(lemma=word.lemma, utext=word.utext)
+        word.distinct_word = distinct_word
+        word.save()
+    print("Finished generating distinct words..    Time passed: %s" % str(timedelta(seconds=time.time() - time_begin)))
+
+    print("----- counting usage of distinct words -----")
+    time_begin = time.time()
+    words = DistinctWord.objects.all()
+    for word in words:
+        word.count = Word.objects.filter(distinct_word=word).count()
+        word.save()
+    print("Finished counting distinct words..    Time passed: %s" % str(timedelta(seconds=time.time() - time_begin)))
+
+
 def import_morphology(test=False):
     """
     """
@@ -168,7 +185,6 @@ def import_morphology(test=False):
         parts = line.strip().split('\t')
         numbers = parts[0]
         numbers = numbers[1:-1].split(':')  # throw first and last characters and split
-
         try:
             sura_number = int(numbers[0])
             aya_number = int(numbers[1])
@@ -264,6 +280,7 @@ def import_morphology(test=False):
     word.utext = get_unicode(word.ttext)  # to save the last word
     word.save()
 
+    # generate unicode arabic text for roots, lemmas, and segments
     roots = Root.objects.all()
     for root in roots:
         root.utext = get_unicode(root.ttext)

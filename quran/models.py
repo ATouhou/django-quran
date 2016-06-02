@@ -134,8 +134,8 @@ class Translation(TranslationModel):
 
 class AyaTranslation(TranslationModel):
     """Translation of an aya"""
-    sura = models.ForeignKey(Sura, related_name='translations', db_index=True)
-    aya = models.ForeignKey(Aya, related_name='translations', db_index=True)
+    sura = models.ForeignKey(Sura, related_name='translations')
+    aya = models.ForeignKey(Aya, related_name='translations')
     translation = models.ForeignKey(Translation, db_index=True)
     ttext = models.TextField(blank=False)
 
@@ -146,14 +146,15 @@ class AyaTranslation(TranslationModel):
 
 class Word(QuranicToken):
     """Arabic word in the Quran"""
-    sura = models.ForeignKey(Sura, related_name='words', db_index=True)
-    aya = models.ForeignKey(Aya, related_name='words', db_index=True)
+    sura = models.ForeignKey(Sura, related_name='words')
+    aya = models.ForeignKey(Aya, related_name='words')
     number = models.IntegerField()
-    lemma = models.ForeignKey('Lemma', related_name='words', null=True, blank=True)
+    lemma = models.ForeignKey('Lemma', related_name='words', null=True, blank=True, db_index=True)
     meaning = models.OneToOneField('WordMeaning', null=True)
+    distinct_word = models.ForeignKey('DistinctWord', related_name='words', null=True, blank=True, db_index=True)
 
     class Meta:
-        unique_together = ('aya', 'number')
+        unique_together = ('aya', 'number') # postgres generates an index for the combination
         ordering = ['number']
 
     def get_absolute_url(self):
@@ -162,6 +163,12 @@ class Word(QuranicToken):
     @property
     def key(self):
         return self.aya.key + '.' + str(self.number)
+
+
+class DistinctWord(QuranicToken):
+    """Arabic word in the Quran"""
+    lemma = models.ForeignKey('Lemma', related_name='distinct_words', null=True, blank=True)
+    count = models.IntegerField(blank=True, null=True)
 
 
 class WordMeaning(TranslationModel):
