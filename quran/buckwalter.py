@@ -1,3 +1,5 @@
+import re
+
 _unicode_to_buckwalter = {
     u"\u0621": "'",  # Hamza
     u"\u0622": "|",  # Alif + MaddahAbove (not used in Tanzil)
@@ -36,6 +38,9 @@ _unicode_to_buckwalter = {
     u"\u0648": "w",  # Waw
     u"\u0649": "Y",  # AlifMaksura
     u"\u064A": "y",  # Ya
+
+    u"\u0654": "#",  # HamzaAbove (extended)                        | hamza above horizontal line
+
     u"\u064B": "F",  # Fathatan
     u"\u064C": "N",  # Dammatan
     u"\u064D": "K",  # Kasratan
@@ -44,33 +49,51 @@ _unicode_to_buckwalter = {
     u"\u0650": "i",  # Kasra
     u"\u0651": "~",  # Shadda
     u"\u0652": "o",  # Sukun
-    u"\u0653": "^",  # Maddah (extended)
-    u"\u0654": "#",  # HamzaAbove (extended)
-    u"\u0670": "`",  # AlifKhanjareeya
-    u"\u0671": "{",  # Alif + HamzaWasl
+    u"\u0653": "^",  # Maddah (extended)                            | mad
+    u"\u0671": "{",  # Alif + HamzaWasl                             | hamza wasl
+    u"\u0670": "`",  # AlifKhanjareeya                              | short elif above
+    u"\u06DC": ":",  # SmallHighSeen (extended)                     | 2 places, sad > seen
+    u"\u06DF": "@",  # SmallHighRoundedZero (extended)              | cezm above elif
+    u"\u06E0": "\"",  # SmallHighUprightRectangularZero (extended)  | mostly above ana's last elif
+    u"\u06E2": "[",  # SmallHighMeemIsolatedForm (extended)         | iklaab
+    u"\u06E3": ";",  # SmallLowSeen (extended)                      | 1 place, sad > seen
+    u"\u06E5": ",",  # SmallWaw (extended)                          | zamir
+    u"\u06E6": ".",  # SmallYa (extended)                           | zamir
+    u"\u06E8": "!",  # SmallHighNoon (extended)                     | 1 place nu!jiY, sura 21, aya id 2571
+    u"\u06EA": "-",  # EmptyCentreLowStop (extended)                | 1 place major-Y`haA, sura 11, aya id 1514
+    u"\u06EB": "+",  # EmptyCentreHighStop (extended)               | 1 place ta>oma+n~aA, sura 12, aya id 1607
+    u"\u06EC": "%",  # RoundedHighStopWithFilledCentre (extended)   | 1 place 'aA%EojamiY~N, sura 41, aya id 4262
+    u"\u06ED": "]",  # SmallLowMeem (extended)                      | 99 places ??
+    u" ": " ",
+
+    # not in quran
     u"\u067E": "P",  # Peh (not Quranic)
     u"\u0686": "J",  # Tcheh (not Quranic)
     u"\u06A4": "V",  # Veh (not Quranic)
     u"\u06AF": "G",  # Gaf (not Quranic)
-    u"\u06DC": ":",  # SmallHighSeen (extended)
-    u"\u06DF": "@",  # SmallHighRoundedZero (extended)
-    u"\u06E0": "\"",  # SmallHighUprightRectangularZero (extended)
-    u"\u06E2": "[",  # SmallHighMeemIsolatedForm (extended)
-    u"\u06E3": ";",  # SmallLowSeen (extended)
-    u"\u06E5": ",",  # SmallWaw (extended)
-    u"\u06E6": ".",  # SmallYa (extended)
-    u"\u06E8": "!",  # SmallHighNoon (extended)
-    u"\u06EA": "-",  # EmptyCentreLowStop (extended)
-    u"\u06EB": "+",  # EmptyCentreHighStop (extended)
-    u"\u06EC": "%",  # RoundedHighStopWithFilledCentre (extended)
-    u"\u06ED": "]",  # SmallLowMeem (extended)
-    u" ": " ",
 }
 
 
 _buckwalter_to_unicode = {}
 for u, bw in _unicode_to_buckwalter.items():
     _buckwalter_to_unicode[bw] = u
+
+
+
+diacritics_latin = 'FNKaui~o^{`:@"[;,.!-+%]'
+diacritics_latin_regex = '[FNKaui~o^{`:@"[;,.!-+%\]]'
+
+def remove_diacritics_latin(input_str):
+    return re.sub(diacritics_latin_regex, '', input_str)
+
+diacritics_unicode = u'['
+for bw in diacritics_latin:
+    diacritics_unicode += _buckwalter_to_unicode[bw]
+diacritics_unicode += ']'
+
+def remove_diacritics_unicode(input_str):
+    return re.sub(diacritics_unicode, '', input_str)
+
 
 
 def get_unicode(buckwalter_str):

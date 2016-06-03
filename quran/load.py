@@ -150,11 +150,7 @@ def import_word_meanings():
 
 
 def import_minimal_words():
-    to_process = Word.objects.filter(utextmin=None).first()
-    if to_process is None:
-        print("----- minimal words already imported SKIPPING! -----")
-        return
-    print("----- importing uthmani minimal words -----")
+    print("----- importing words from uthmani minimal script-----")
     time_begin = time.time()
     quran = parse(path_to('data/tanzil/quran-uthmani-min.xml'))
 
@@ -180,9 +176,26 @@ def import_minimal_words():
     print("Finished importing minimal words..    Time passed: %s" % str(timedelta(seconds=time.time() - time_begin)))
 
 
-def generate_distinct_words():
+def generate_minimal_words():
+    """ by removing the diacrtics """
+    print("----- generating minimal words by removing diacritics-----")
+    time_begin = time.time()
+    words = Word.objects.all()
+    for word in words:
+        word.utextmin = remove_diacritics_unicode(word.utext)
+        # word.utextmin = get_unicode(remove_diacritics_latin(word.ttext)) # other way around if need be
+        word.save()
+    print("Finished generating minimal words..    Time passed: %s" % str(timedelta(seconds=time.time() - time_begin)))
 
-    import_minimal_words()
+
+def generate_distinct_words():
+    """ """
+    to_process = Word.objects.filter(utextmin=None).first()
+    if to_process is None:
+        print("----- minimal words already exists SKIPPING! -----")
+    else:
+        # import_minimal_words()
+        generate_minimal_words()
 
     print("----- generating distinct words -----")
     time_begin = time.time()
@@ -245,6 +258,7 @@ def import_morphology(test=False):
                 aya = Aya.objects.get(sura=sura, number=aya_number)
             if word.number != -1:  # non initial word
                 word.utext = get_unicode(word.ttext)
+                word.utextmin = remove_diacritics_unicode(word.utext)
                 word.save()  # to save word text
             word, created = Word.objects.get_or_create(sura=sura, aya=aya, number=word_number)
             word.ttext = ttext

@@ -6,7 +6,7 @@ from quran.management.commands.delete_word_meanings import *
 
 
 class Command(BaseCommand):
-    help = "Load initial Quran data."
+    help = "Generate distinct words."
 
     def handle(self, **options):
         delete_distinct_words()
