@@ -5,7 +5,7 @@ from django.db import connection
 from quran.management.commands.load_morphology import delete_morphology
 
 def delete_quran():
-    print("------ deleting suras, translations, ayas, ayatranslations")
+    print("----- deleting suras, translations, ayas, ayatranslations")
     cursor = connection.cursor()
     cursor.execute('delete from postgres.quran.quran_ayatranslation')
     cursor.execute('delete from postgres.quran.quran_translation')

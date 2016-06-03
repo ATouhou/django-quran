@@ -151,6 +151,7 @@ class Word(QuranicToken):
     number = models.IntegerField()
     lemma = models.ForeignKey('Lemma', related_name='words', null=True, blank=True, db_index=True)
     meaning = models.OneToOneField('WordMeaning', null=True)
+    utextmin = models.TextField(blank=True, null=True, db_index=True)  # unicode minimal (uthmani)
     distinct_word = models.ForeignKey('DistinctWord', related_name='words', null=True, blank=True, db_index=True)
 
     class Meta:

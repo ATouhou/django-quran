@@ -6,7 +6,7 @@ from quran.management.commands.delete_word_meanings import delete_word_meanings
 
 def delete_morphology():
     cursor = connection.cursor()
-    print("------ deleting words, segments, lemmas, roots, pos', moods, genders, forms, specials, cases, definites, tenses, participles")
+    print("----- deleting words, segments, lemmas, roots, pos', moods, genders, forms, specials, cases, definites, tenses, participles")
     cursor.execute('delete from postgres.quran.quran_wordsegment')
     cursor.execute('delete from postgres.quran.quran_segment')
     cursor.execute('delete from postgres.quran.quran_word')

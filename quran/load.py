@@ -1,4 +1,3 @@
-
 from datetime import timedelta
 import time
 
@@ -150,7 +149,39 @@ def import_word_meanings():
     cursor.execute("""update quran.quran_wordmeaning set ttext=replace(ttext, '"', '\\"')""") # escape " characters, prevent bug in json
 
 
+def import_minimal_words():
+    to_process = Word.objects.filter(utextmin=None).first()
+    if to_process is None:
+        print("----- minimal words already imported SKIPPING! -----")
+        return
+    print("----- importing uthmani minimal words -----")
+    time_begin = time.time()
+    quran = parse(path_to('data/tanzil/quran-uthmani-min.xml'))
+
+    for sura_index in range(1, 115):
+        sura = quran.getElementsByTagName('sura')[sura_index - 1]
+        ayas = sura.getElementsByTagName('aya')
+        for aya in ayas:
+            aya_number = int(aya.getAttribute('index'))
+            aya_utext = aya.getAttribute('text')
+            words = aya_utext.strip().split(u' ')
+            if sura_index == 37 and aya_number == 130: # word il yaseen somehow have a space in it
+                words[2] = words[2] + ' ' + words [3]
+                words = words[0:2]
+            aya_id = Aya.objects.filter(sura_id=sura_index, number=aya_number).first().id
+            for word_number, word in enumerate(words):
+                target = Word.objects.filter(sura_id=sura_index, aya_id=aya_id, number=word_number + 1).first()
+                # if not target:
+                #     print(sura_index, aya_number, word_number + 1, get_buckwalter(word))  # for debugging
+                # else:
+                target.utextmin = word
+                target.save()
+
+    print("Finished importing minimal words..    Time passed: %s" % str(timedelta(seconds=time.time() - time_begin)))
+
+
 def generate_distinct_words():
+
     print("----- generating distinct words -----")
     time_begin = time.time()
     words = Word.objects.order_by('sura_id', 'aya_id', 'number').all()
