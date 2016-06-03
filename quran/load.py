@@ -182,11 +182,13 @@ def import_minimal_words():
 
 def generate_distinct_words():
 
+    import_minimal_words()
+
     print("----- generating distinct words -----")
     time_begin = time.time()
     words = Word.objects.order_by('sura_id', 'aya_id', 'number').all()
     for word in words:
-        distinct_word, created = DistinctWord.objects.get_or_create(lemma=word.lemma, utext=word.utext)
+        distinct_word, created = DistinctWord.objects.get_or_create(lemma=word.lemma, utext=word.utextmin)
         word.distinct_word = distinct_word
         word.save()
     print("Finished generating distinct words..    Time passed: %s" % str(timedelta(seconds=time.time() - time_begin)))
