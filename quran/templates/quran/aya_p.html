@@ -8,8 +8,15 @@
 
     <li>
         <p class="aya">
-            <span class="key"> <a href="{{aya.get_absolute_url}}" class="blank_link">{{aya.key}} </a></span>
-            <span class="aya" id="{{aya.aya_id}}" data-aya="{{aya.number}}" data-sura="{{aya.sura.number}}"> {{aya.text}} </span>
+            <span class="key">
+                <a href="{{aya.get_absolute_url}}" class="blank_link">
+                {{aya.key}}
+                </a>
+            </span>
+
+            <span class="aya" id="{{aya.aya_id}}" data-sura="{{aya.sura.number}}" data-aya="{{aya.number}}">
+                {{aya.text}}
+            </span>
         </p>
         <p class="translation">
             {{ aya.translations.all.0.text }}

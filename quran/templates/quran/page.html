@@ -12,24 +12,26 @@
                         {% for aya in ayas %}
                         {% if aya.bismillah %}
                         <div class="header">
-سورة {{aya.sura.text}}
+                            سورة {{aya.sura.text}}
                         </div>
                         <div class="bismillah" style="text-align: center;">
                             {{ aya.bismillah }}
                         </div>
                         {% endif %}
 
-                        <span id="{{aya.aya_id}}" class="aya" data-aya="{{aya.number}}" data-sura="{{aya.sura.number}}">
-                            {{aya.text}}
-                        </span>
+                            <span>
+                                <span class="aya" id="{{aya.aya_id}}" data-sura="{{aya.sura.number}}" data-aya="{{aya.number}}">
+                                    {{aya.text}}
+                                </span>
 
-                        <span class="key" title="{{aya.translations.all.0.text}}" style="display:inline-block;">
-                            <a href="{{aya.get_absolute_url}}" class="aya_numerals">
-                                ﴿{{aya.number|arabic_numerals}}﴾
-                            </a>
-                        </span>
+                                <span class="key" title="{{aya.translations.all.0.text}}" style="display:inline-block;">
+                                    <a href="{{aya.get_absolute_url}}" class="aya_numerals">
+                                        ﴿{{aya.number|arabic_numerals}}﴾
+                                    </a>
+                                </span>
 
-                        {{aya.word_meanings_json|safe}}
+                                {{aya.word_meanings_json|safe}}
+                            </span>
                         {% endfor %}
                     </div>
                 </div>
@@ -41,4 +43,3 @@
 {% include "quran/aya_script_links.html" %}
 
 {% endblock %}
-

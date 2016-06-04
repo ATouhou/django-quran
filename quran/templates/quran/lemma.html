@@ -17,7 +17,7 @@ Root:
             {{ word.text }}
         </a>
             {% include "quran/aya_p.html" with aya=word.aya %}
-            {% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select="#id"|add:word.aya.aya_id %}
+            {% include "quran/aya_script_highlight.html" with highlight_text=word.utext highlight_select="#"|add:word.aya.aya_id %}
 
     </li>
     {% endfor %}
