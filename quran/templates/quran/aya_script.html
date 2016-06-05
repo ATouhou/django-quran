@@ -1,0 +1,37 @@
+
+{# break each aya in words and wrap each word in <a> to put word meanings in tooltips #}
+
+{% url 'quran_index' as base_url %}
+
+<script>
+    ayas = $('span.aya')
+    ayas.toArray().forEach(function (aya) {
+
+//        debugger
+        var meanings = word_meanings[aya.id]
+        var words_to_highlight = (words_to_highlight_in_aya[aya.id] || []).concat(words_to_highlight_in_page)
+        var sura_number = aya.attributes['data-sura'].value
+        var aya_number = aya.attributes['data-aya'].value
+        var old_html = aya.innerHTML
+        var new_html = ''
+        var words = old_html.trim().split(' ')
+
+//        console.log(words)
+        words.forEach(function (word, index) {
+
+            // highlight words if necessary
+            words_to_highlight.forEach(function(word_to_highlight){
+                if (word.indexOf(word_to_highlight) >= 0) { // word_to_highlight might be a substring of the word
+                    word = '<span class="highlighted_word">' + word + '</span>'
+                    // todo break loop here - if word highlighted once
+                }
+            })
+
+            new_html += '<a href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index+1) + '/" ' +
+                'title="' + meanings[index] + '"' +
+                'target="_blank" class="word">' + word + '</a> '
+        })
+
+        aya.innerHTML  = new_html
+    })
+</script>

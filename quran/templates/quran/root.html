@@ -9,13 +9,13 @@ Root: {{ lemmas.0.root.utext }}
         Lemma: <a href="{{ lemma.get_absolute_url }}" class="blank_link">{{ lemma.utext }}</a>
         {% for word in lemma.words.all.distinct|dictsort:"sura_id"|dictsort:"aya_id" %}
         {% include 'quran/aya_p.html' with aya=word.aya %}
-        {% include 'quran/aya_script_highlight.html' with highlight_text=word.utext highlight_select="#"|add:word.aya.aya_id %}
+        <script>words_to_highlight_in_aya['{{word.aya.aya_id}}'] = ["{{word.utext}}"]</script>
         {% endfor %}
     </li>
     <hr>
     {% endfor %}
 </ul>
 
-{% include "quran/aya_script_links.html" %}
+{% include "quran/aya_script.html" %}
 
 {% endblock %}
