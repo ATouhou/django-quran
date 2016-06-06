@@ -24,10 +24,10 @@
                 })
 
                 if (display_word_meaning)
-                    new_html += '<div style="display:inline-block; text-align:center;">'
+                    new_html += '<div class="word_wrapper">'
                             + '<a  class="word" href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index + 1) + '/" '
                             + 'target="_blank">' + word + '</a> '
-                            + '<br><div style="height:15px; font-size:small;">&nbsp;&lrm;' + meanings[index] + '&lrm;&nbsp;|</div></div>'
+                            + '<br><div class="word_meaning ltr_safe">&nbsp;' + meanings[index] + '&nbsp;|</div></div>'
                 else
                     new_html += '<a  class="word" href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index + 1) + '/" '
                             + 'title="&lrm;' + meanings[index] + '&lrm;" target="_blank">' + word + '</a> '

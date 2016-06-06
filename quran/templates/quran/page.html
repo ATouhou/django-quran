@@ -30,16 +30,16 @@
                                     {{aya.text}}
                                 </span>
 
-                                <span class="key" title="&lrm;{{aya.translations.all.0.text}}&lrm;">
+                                <span class="key" title="{{aya.translations.all.0.text}}">
                                     {% if display_word_meaning %}
-                                    <div style="display:inline-block; text-align:center;">
+                                    <div class="word_wrapper">
                                     {% endif %}
 
-                                    <a href="{{aya.get_absolute_url}}" class="aya_numerals">﴿{{aya.number|arabic_numerals}}﴾</a>
+                                    <a class="aya_numerals" href="{{aya.get_absolute_url}}">﴿{{aya.number|arabic_numerals}}﴾</a>
 
                                     {% if display_word_meaning %}
                                     <br>
-                                    <div style="height:15px; font-size:small; visibility:hidden;">.</div> <!-- just for spacing -->
+                                    <div class="word_meaning" style=visibility:hidden;">.</div> <!-- just for spacing -->
                                     </div>
                                     {% endif %}
                                 </span>

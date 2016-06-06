@@ -99,3 +99,8 @@ div#index {
     content: '\200F';
     /* &rlm; character */
 }
+
+div.word_wrapper{
+    display:inline-block;
+    text-align:center;
+}
