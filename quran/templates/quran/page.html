@@ -3,6 +3,13 @@
 {% block body %}
 
 {% load quran %}
+
+{% if display_word_meaning %}
+<script> var display_word_meaning = true </script>
+{% else %}
+<script> var display_word_meaning = false </script>
+{% endif %}
+
 <div class="wire_frame page_container">
     <div class="outer_frame">
         <div class="wire_frame">
@@ -10,11 +17,10 @@
                 <div class="wire_frame" style="padding: 3px;">
                     <div class="page wire_frame" style="padding: 10px;">
                         {% for aya in ayas %}
+
                         {% if aya.bismillah %}
-                        <div class="header">
-                            سورة {{aya.sura.text}}
-                        </div>
-                        <div class="bismillah" style="text-align: center;">
+                        <div class="header">سورة {{aya.sura.text}}</div>
+                        <div class="bismillah">
                             {{ aya.bismillah }}
                         </div>
                         {% endif %}
@@ -24,10 +30,18 @@
                                     {{aya.text}}
                                 </span>
 
-                                <span class="key" title="{{aya.translations.all.0.text}}" style="display:inline-block;">
-                                    <a href="{{aya.get_absolute_url}}" class="aya_numerals">
-                                        ﴿{{aya.number|arabic_numerals}}﴾
-                                    </a>
+                                <span class="key" title="&lrm;{{aya.translations.all.0.text}}&lrm;">
+                                    {% if display_word_meaning %}
+                                    <div style="display:inline-block; text-align:center;">
+                                    {% endif %}
+
+                                    <a href="{{aya.get_absolute_url}}" class="aya_numerals">﴿{{aya.number|arabic_numerals}}﴾</a>
+
+                                    {% if display_word_meaning %}
+                                    <br>
+                                    <div style="height:15px; font-size:small; visibility:hidden;">.</div> <!-- just for spacing -->
+                                    </div>
+                                    {% endif %}
                                 </span>
 
                                 {{aya.word_meanings_json|safe}}

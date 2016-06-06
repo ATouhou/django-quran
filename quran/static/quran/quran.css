@@ -20,7 +20,7 @@ div.page {
 span.key a.aya_numerals {
     text-decoration: none;
     color: gray;
-    font-size: .7em;
+    font-size: .8em;
 }
 
 div.page div.header {
@@ -30,6 +30,10 @@ div.page div.header {
     text-align: center;
     padding: 1em;
     font-size: 0.8em
+}
+
+div.bismillah {
+    text-align: center;
 }
 
 div.page_container {
