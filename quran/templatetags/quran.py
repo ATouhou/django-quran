@@ -19,3 +19,12 @@ def arabic_numerals(number):
         '9': u'۹',
     }
     return ''.join([dic[digit] for digit in number_string])
+
+@register.filter
+def ltr_safe(input_string):
+    return '&lrm;' + input_string + '&lrm;'
+
+
+@register.filter
+def rtl_safe(input_string):
+    return '&rlm;' + input_string + '&rlm;'
