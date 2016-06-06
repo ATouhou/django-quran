@@ -29,9 +29,11 @@ class PageView(TemplateView):
     def get_context_data(self, page_number, **kwargs):
         context = super(PageView, self).get_context_data(**kwargs)
         page = Page.objects.get(number=page_number)
+
         ayas = Aya.objects.filter(id__gte=page.aya_begin_id, id__lte=page.aya_end_id)\
             .prefetch_related(prefetch_aya_translations(self.request))
         context['ayas'] = ayas
+        context['display_word_meaning'] = self.request.session['display_word_meaning']
         return context
 
 
@@ -97,9 +99,17 @@ class RootIndexView(TemplateView):
 
 
 def settings(request):
-    translation = request.GET.get('translation', None)
-    if translation:
-        request.session['translation'] = translation
+    settings_list = {
+        'translation': 1,
+        'display_word_meaning': False,
+    }
+    for setting, default in settings_list.items():
+        if request.GET.get(setting, None):
+            request.session[setting] = request.GET.get(setting, None)
+            if request.session[setting].lower() == 'false':
+                request.session[setting] = False
+        elif not setting in request.session:
+            request.session[setting] = default
     return redirect('quran_index')
 
 
