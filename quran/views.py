@@ -98,11 +98,12 @@ class RootIndexView(TemplateView):
         return context
 
 
+settings_list = {
+    'translation': 1,
+    'display_word_meaning': False,
+    'learning': False,
+}
 def settings(request):
-    settings_list = {
-        'translation': 1,
-        'display_word_meaning': False,
-    }
     for setting, default in settings_list.items():
         if request.GET.get(setting, None):
             request.session[setting] = request.GET.get(setting, None)

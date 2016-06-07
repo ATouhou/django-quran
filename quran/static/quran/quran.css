@@ -1,4 +1,7 @@
 
+span.aya {
+}
+
 a.word {
     text-decoration: none;
     color: black
@@ -9,7 +12,7 @@ a.word:hover {
 }
 
 div.page {
-    text-align: justify;
+    /*text-align: justify;*/ /* can't do it if showing word meanings, and messes up some */
     font-family: 'Traditional Arabic';
     font-size: 2.5em;
     font-weight: normal;
@@ -41,9 +44,18 @@ div.page_container {
     width:770px;
 }
 
+div.word_wrapper{
+    display:inline-block;
+    text-align:center;
+}
+
 div.word_meaning {
     height:20px;
     font-size:medium;
+}
+
+div.word_meaning:hover{
+    background-color: rgba(158, 244, 224, 0.77);
 }
 
 .wire_frame {
@@ -98,9 +110,4 @@ div#index {
 .rtl_safe::before{
     content: '\200F';
     /* &rlm; character */
-}
-
-div.word_wrapper{
-    display:inline-block;
-    text-align:center;
 }

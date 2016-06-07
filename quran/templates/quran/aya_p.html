@@ -14,9 +14,12 @@
                 </a>
             </span>
 
-            <span class="aya" id="{{aya.aya_id}}" data-sura="{{aya.sura.number}}" data-aya="{{aya.number}}">
-                {{aya.text}}
-            </span>
+            <bdo dir="rtl">
+                <span class="aya" id="{{aya.aya_id}}" data-sura="{{aya.sura.number}}" data-aya="{{aya.number}}">
+                    {{aya.text}}
+                </span>
+            </bdo>
+
         </p>
         <p class="translation">
             {{ aya.translations.all.0.text }}
