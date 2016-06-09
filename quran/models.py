@@ -49,8 +49,8 @@ SURA_TYPES = (
 
 class Sura(QuranicToken):
     """Sura (chapter) of the Quran"""
-    etext = models.TextField(blank=True, null=True, db_index=True)  # english name
     number = models.IntegerField(primary_key=True, verbose_name='Sura Number')
+    etext = models.TextField(blank=True, null=True, db_index=True)  # english name
     order = models.IntegerField(verbose_name='Revelation Order')
     type = models.CharField(max_length=7, choices=SURA_TYPES, verbose_name='')
     rukus = models.IntegerField(verbose_name='Number of Rukus')

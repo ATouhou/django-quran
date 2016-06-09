@@ -33,7 +33,7 @@ class PageView(TemplateView):
         ayas = Aya.objects.filter(id__gte=page.aya_begin_id, id__lte=page.aya_end_id)\
             .prefetch_related(prefetch_aya_translations(self.request))
         context['ayas'] = ayas
-        context['display_word_meaning'] = self.request.session['display_word_meaning']
+        context['display_word_meanings'] = get_setting(self.request, 'display_word_meanings')
         return context
 
 
@@ -68,7 +68,7 @@ class LemmaView(TemplateView):
     def get_context_data(self, lemma_id, **kwargs):
         context = super(LemmaView, self).get_context_data(**kwargs)
         lemma = get_object_or_404(Lemma, pk=lemma_id)
-        aya_translation_queryset = AyaTranslation.objects.filter(translation_id=get_translation_id(self.request))
+        aya_translation_queryset = AyaTranslation.objects.filter(translation_id=get_setting(self.request, 'translation'))
         words = lemma.words.all() \
             .order_by('sura_id', 'aya_id') \
             .prefetch_related('aya') \
@@ -84,7 +84,7 @@ class RootView(TemplateView):
         context = super(RootView, self).get_context_data(**kwargs)
         lemmas = Lemma.objects.filter(root__id=root_id)\
             .prefetch_related('words__aya')\
-            .prefetch_related(Prefetch('words__aya__translations', queryset=AyaTranslation.objects.filter(translation_id=get_translation_id(self.request))))
+            .prefetch_related(Prefetch('words__aya__translations', queryset=AyaTranslation.objects.filter(translation_id=get_setting(self.request, 'translation'))))
         context['lemmas'] = lemmas  # , 'ayas': ayas
         return context
 
@@ -99,30 +99,29 @@ class RootIndexView(TemplateView):
 
 
 settings_list = {
-    'translation': 1,
-    'display_word_meaning': False,
+    'translation': Translation.objects.first().id,
+    'display_word_meanings': False,
     'learning': False,
 }
+
+
 def settings(request):
     for setting, default in settings_list.items():
         if request.GET.get(setting, None):
             request.session[setting] = request.GET.get(setting, None)
             if request.session[setting].lower() == 'false':
                 request.session[setting] = False
-        elif not setting in request.session:
-            request.session[setting] = default
     return redirect('quran_index')
 
 
-def get_translation_id(request):
-    if 'translation' in request.session:
-        return request.session['translation']
-    else:
-        return 1
+def get_setting(request, setting):
+    if not setting in request.session:
+        request.session[setting] = settings_list[setting]
+    return request.session.get(setting)
 
 
 def prefetch_aya_translations(request):
-    translation_id = get_translation_id(request)
+    translation_id = get_setting(request, 'translation')
     return Prefetch('translations', queryset=AyaTranslation.objects.filter(translation_id=translation_id))
 
 
