@@ -34,6 +34,7 @@ class PageView(TemplateView):
             .prefetch_related(prefetch_aya_translations(self.request))
         context['ayas'] = ayas
         context['display_word_meanings'] = get_setting(self.request, 'display_word_meanings')
+        context['page_number'] = page_number
         return context
 
 

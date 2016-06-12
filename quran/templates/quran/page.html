@@ -8,20 +8,22 @@
 <script> display_word_meanings = true </script>
 {% endif %}
 
-<div class="wire_frame page_container">
-    <div class="outer_frame">
-        <div class="wire_frame">
-            <div class="inner_frame">
-                <div class="wire_frame" style="padding: 3px;">
-                    <div class="page wire_frame" style="padding: 10px;">
-                        {% for aya in ayas %}
+<div class="page_container">
 
-                        {% if aya.bismillah %}
-                        <div class="header">سورة {{aya.sura.text}}</div>
-                        <div class="bismillah">
-                            {{ aya.bismillah }}
-                        </div>
-                        {% endif %}
+    <div class="wire_frame">
+        <div class="outer_frame">
+            <div class="wire_frame">
+                <div class="inner_frame">
+                    <div class="wire_frame" style="padding: 3px;">
+                        <div class="page wire_frame" style="padding: 10px;">
+                            {% for aya in ayas %}
+
+                            {% if aya.bismillah %}
+                            <div class="header">سورة {{aya.sura.text}}</div>
+                            <div class="bismillah">
+                                {{ aya.bismillah }}
+                            </div>
+                            {% endif %}
 
                             <span>
                                 <span class="aya" id="{{aya.aya_id}}" data-sura="{{aya.sura.number}}" data-aya="{{aya.number}}">
@@ -44,14 +46,15 @@
 
                                 {{aya.word_meanings_json|safe}}
                             </span>
-                        {% endfor %}
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    {% include 'quran/page_navigation.html' %}
 </div>
-
 {% include "quran/aya_script.html" %}
 
 {% endblock %}
