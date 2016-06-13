@@ -28,7 +28,7 @@ span.key a.aya_numerals {
 }
 
 div.page div.header {
-    height: 1.5em;
+    /*height: 2em;*/
     /*noinspection CssUnknownTarget*/
     background: url('/static/quran/header_contrasted22.svg') no-repeat center center;
     background-size: 100%;
@@ -48,6 +48,7 @@ div.page_container {
 div.word_wrapper{
     display:inline-block;
     text-align:center;
+    margin-left: 10px;
 }
 
 div.word_meaning {
