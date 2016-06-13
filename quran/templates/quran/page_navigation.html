@@ -7,11 +7,13 @@
             </a>
           </span>
         <input type="text" class="form-control page_number" placeholder="Page #" value="{{page_number}}">
-          <span class="input-group-btn">
+        {% if page_number > 1 %}
+        <span class="input-group-btn">
             <a class="btn btn-default" href="/quran/page/{{page_number|add:'-1'}}" type="button" title="Previous Page">
                 <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
             </a>
           </span>
+        {% endif %}
     </div>
 
 </div>
