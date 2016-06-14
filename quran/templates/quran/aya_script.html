@@ -25,14 +25,16 @@
 
                 if (display_word_meanings)
                     new_html += '<div class="word_wrapper" data-word="' + index + '">'
-                            + '<a  class="word" href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index + 1) + '/" '
+                            + '<div class="word">'
+                            + '<a class="word" href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index + 1) + '/" '
                             + 'target="_blank">' + word + '</a>'
-                            + '<br/><div class="word_meaning ltr_safe">&nbsp;' + meanings[index] + '&nbsp;|</div></div>'
+                            + '</div><div class="word_meaning ltr_safe">&nbsp;' + meanings[index] + '&nbsp;|</div></div>'
                 else
                     new_html += '<div class="word_wrapper" data-word="' + index + '">'
-                            + '<a  class="word" href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index + 1) + '/" '
+                            + '<div class="word">'
+                            + '<a class="word" href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index + 1) + '/" '
                             + 'title="&lrm;' + meanings[index] + '&lrm;" target="_blank">' + word + '</a>'
-                            + '</div>'
+                            + '</div></div>'
             })
 
             aya.innerHTML = new_html
