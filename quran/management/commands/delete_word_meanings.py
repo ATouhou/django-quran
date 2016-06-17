@@ -5,9 +5,9 @@ from django.db import connection
 def delete_word_meanings():
     cursor = connection.cursor()
     print("----- deleting words' meanings ----------- ")
-    cursor.execute('update postgres.quran.quran_word set meaning_id=null')
-    cursor.execute('delete from postgres.quran.quran_wordmeaning')
-    cursor.execute("alter sequence quran.quran_wordmeaning_id_seq minvalue 1 start with 1 restart")
+    cursor.execute('update quran_word set meaning_id=null')
+    cursor.execute('delete from quran_wordmeaning')
+    cursor.execute("alter sequence quran_wordmeaning_id_seq minvalue 1 start with 1 restart")
 
 
 class Command(BaseCommand):

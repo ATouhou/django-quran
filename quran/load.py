@@ -139,14 +139,14 @@ def import_word_meanings():
     Word.objects.all().update(meaning_id=F('id'))
     # cant do '__' join in bulk update
     cursor = connection.cursor()
-    cursor.execute("""update quran.quran_wordmeaning wm
+    cursor.execute("""update quran_wordmeaning wm
                     set aya_id = w.aya_id
-                    from quran.quran_word w
+                    from quran_word w
                     where wm.id = w.id """)
     # for word in Word.objects.all():
     #     word.meaning.aya = word.aya
     #     word.meaning.save()
-    cursor.execute("""update quran.quran_wordmeaning set ttext=replace(ttext, '"', '\\"')""") # escape " characters, prevent bug in json
+    cursor.execute("""update quran_wordmeaning set ttext=replace(ttext, '"', '\\"')""") # escape " characters, prevent bug in json
 
 
 def import_minimal_words():

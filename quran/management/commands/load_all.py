@@ -21,5 +21,6 @@ class Command(BaseCommand):
         import_quran()
         import_morphology()
         import_word_meanings()
+        generate_distinct_words()
 
         test_data(verbosity=2)

@@ -100,7 +100,7 @@ class RootIndexView(TemplateView):
 
 
 settings_list = {
-    'translation': Translation.objects.first().id,
+    'translation': 1, #Translation.objects.first().id, # problem for migrating to another server
     'display_word_meanings': False,
     'learning': False,
 }
