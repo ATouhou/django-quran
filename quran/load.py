@@ -96,8 +96,8 @@ def import_translation_txt(path_, translation):
         line = line.strip()
         t = AyaTranslation(sura=aya.sura, aya=aya, translation=translation, ttext=line)
         t.save()
-        if aya.number == 1:
-            print("Loaded translation: [%s]     sura: %d" % (translation.ttext, aya.sura_id))
+        # if aya.number == 1:
+        #     print("Loaded translation: [%s]     sura: %d" % (translation.ttext, aya.sura_id))
 
 
 def import_word_meanings():
