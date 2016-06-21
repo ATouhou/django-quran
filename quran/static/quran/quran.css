@@ -1,6 +1,21 @@
+@font-face {
+    font-family: KFGQPC_Naskh;
+    src: url(/static/quran/fonts/kfc_naskh.otf) format("truetype")
+}
+
+@font-face {
+    font-family: Me-Quran;
+    src: url(/static/quran/fonts/me_quran.ttf) format("truetype")
+}
+
+@font-face {
+    font-family: Scheherazade;
+    src: url(/static/quran/fonts/scheherazade.ttf) format("truetype")
+}
+
 div.page_container {
     width:770px;
-    margin-left: 10px;
+    margin-left: 12px;
 }
 
 div.word_wrapper{
@@ -47,8 +62,11 @@ a.blank_link {
     color:black;
 }
 
+p.aya, div.page {
+    font-family: Scheherazade;
+}
+
 p.aya {
-    font-family:'Traditional Arabic';
     font-size: 2em
 }
 
@@ -71,7 +89,6 @@ span.aya {
 
 div.page {
     /*text-align: justify;*/ /* can't do it if showing word meanings, and messes up some */
-    font-family: 'Traditional Arabic';
     font-size: 3em;
     font-weight: normal;
     direction: rtl;
