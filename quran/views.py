@@ -55,7 +55,7 @@ class WordView(TemplateView):
         aya = Aya.objects.filter(sura__number=sura_number, number=aya_number) \
             .prefetch_related(prefetch_aya_translations(self.request))
         word = Word.objects.filter(aya=aya, number=word_number).prefetch_related()  # todo cant see extent of data brought
-        ayas = Aya.objects.filter(words__utext=word[0].utext) \
+        ayas = Aya.objects.filter(words__distinct_word=word[0].distinct_word) \
             .order_by('sura_id', 'number') \
             .prefetch_related(prefetch_aya_translations(self.request))  # other ayas with same word
         context['word'] = word[0]
