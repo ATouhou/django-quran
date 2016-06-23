@@ -20,8 +20,8 @@ body {
 }
 
 div.page_container {
-    width:770px;
-    margin-left: 20px;
+    max-width:980px;
+    margin: 10px;
 }
 
 div.word_wrapper{
