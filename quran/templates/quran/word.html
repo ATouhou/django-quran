@@ -1,53 +1,55 @@
 {% extends 'quran/base.html' %}
 {% block body %}
 
-Word: <span class="highlighted_word">{{word.utext}}</span>
+<div class="dark-box header">
+    Word: <span class="highlighted_word">{{word.utext}}</span>
 
-{% if word.lemma %}
-| Lemma:
-<a href="{{ word.lemma.get_absolute_url }}" class="blank_link" target="_blank">
-    {{ word.lemma.utext }}
-</a>
-{% endif %}
+    {% if word.lemma %}
+    | Lemma:
+    <a href="{{ word.lemma.get_absolute_url }}" class="blank_link" target="_blank">
+        {{ word.lemma.utext }}
+    </a>
+    {% endif %}
 
-{% if word.lemma.root %}
-| Root:
-<a href="{{ word.lemma.root.get_absolute_url }}" class="blank_link" target="_blank">
-    {{ word.lemma.root.utext }}
-</a>
-{% endif %}
+    {% if word.lemma.root %}
+    | Root:
+    <a href="{{ word.lemma.root.get_absolute_url }}" class="blank_link" target="_blank">
+        {{ word.lemma.root.utext }}
+    </a>
+    {% endif %}
+</div>
 
-{% for segment in word.segments.all %}
-<hr>
-{{segment.utext}}
+<div class="white-box">
+    {% for segment in word.segments.all %}
+    {{segment.utext}}
 
-{% if segment.pos %} | {{segment.pos}} {% endif %}
-{% if segment.mood %} | MOOD: {{segment.mood}} {% endif %}
-{% if segment.case %} | CASE: {{segment.case}} {% endif %}
-{% if segment.form %} | FORM: {{segment.form}} {% endif %}
-{% if segment.gender %} | GENDER: {{segment.gender}} {% endif %}
-{% if segment.definite %} | DEFINITE: {{segment.definite}} {% endif %}
-{% if segment.tense %} | TENSE: {{segment.tense}} {% endif %}
-{% if segment.participle %} | PARTICIPLE: {{segment.participle}} {% endif %}
-{% if segment.special %} | SP: {{segment.special}} {% endif %}
-{% if segment.other %} | OTHER: {{segment.other}} {% endif %}
-
-{% endfor %}
-
-<hr>
+    {% if segment.pos %} | {{segment.pos}} {% endif %}
+    {% if segment.mood %} | MOOD: {{segment.mood}} {% endif %}
+    {% if segment.case %} | CASE: {{segment.case}} {% endif %}
+    {% if segment.form %} | FORM: {{segment.form}} {% endif %}
+    {% if segment.gender %} | GENDER: {{segment.gender}} {% endif %}
+    {% if segment.definite %} | DEFINITE: {{segment.definite}} {% endif %}
+    {% if segment.tense %} | TENSE: {{segment.tense}} {% endif %}
+    {% if segment.participle %} | PARTICIPLE: {{segment.participle}} {% endif %}
+    {% if segment.special %} | SP: {{segment.special}} {% endif %}
+    {% if segment.other %} | OTHER: {{segment.other}} {% endif %}
+    <br>
+    {% endfor %}
+</div>
 
 {% include "quran/aya_p.html" with aya=aya %}
 
-<hr>
 {% if ayas.count > 1 %}
-Word {{word.utext}} in other verses:
+<div class="light-box header">
+    Word <span class="highlighted_word">{{word.utext}}</span> in other verses:
+</div>
 {% else %}
 No other verses with word {{word.utext}}
 {% endif %}
 
 {% for ay in ayas %}
 {% if ay.key != aya.key %}
-    {% include "quran/aya_p.html" with aya=ay %}
+{% include "quran/aya_p.html" with aya=ay %}
 {% endif %}
 {% endfor %}
 

@@ -1,21 +1,22 @@
 {% extends 'quran/base.html' %}
 {% block body %}
 
-Root: {{ lemmas.0.root.utext }}
-<hr>
-<ul>
-    {% for lemma in lemmas %}
-    <li>
-        Lemma: <a href="{{ lemma.get_absolute_url }}" class="blank_link">{{ lemma.utext }}</a>
-        {% for word in lemma.words.all.distinct|dictsort:"sura_id"|dictsort:"aya_id" %}
-        {% include 'quran/aya_p.html' with aya=word.aya %}
-        <script>words_to_highlight_in_aya['{{word.aya.aya_id}}'] = ["{{word.utext}}"]</script>
-        {% endfor %}
-    </li>
-    <hr>
-    {% endfor %}
-</ul>
+<div class="dark-box header">
+    Root: <span class="highlighted_word">{{ lemmas.0.root.utext }}</span>
+</div>
 
+{% for lemma in lemmas %}
+<div class="light-box header">
+    Lemma: <a href="{{ lemma.get_absolute_url }}" class="blank_link"><span
+        class="highlighted_word">{{ lemma.utext }}</span></a>
+</div>
+
+{% for word in lemma.words.all.distinct|dictsort:"sura_id"|dictsort:"aya_id" %}
+{% include 'quran/aya_p.html' with aya=word.aya %}
+<script>words_to_highlight_in_aya['{{word.aya.aya_id}}'] = ["{{word.utext}}"]</script>
+{% endfor %}
+
+{% endfor %}
 {% include "quran/aya_script.html" %}
 
 {% endblock %}

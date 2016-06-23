@@ -1,4 +1,4 @@
-<div>
+<div class="white-box">
     {% if show_bismillah and aya.bismillah %}
     <hr>
     <p align="center">
@@ -6,7 +6,7 @@
     </p>
     {% endif %}
 
-    <li>
+    <div class="aya-p-inner">
         <p class="aya">
             <span class="key" style="vertical-align: text-top">
                 <a href="{{aya.get_absolute_url}}" class="blank_link">
@@ -25,5 +25,5 @@
             {{ aya.translations.all.0.text }}
         </p>
         {{aya.word_meanings_json|safe}}
-    </li>
+    </div>
 </div>

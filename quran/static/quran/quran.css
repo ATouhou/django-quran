@@ -13,9 +13,15 @@
     src: url(/static/quran/fonts/scheherazade.ttf) format("truetype")
 }
 
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #f2f2f2;
+
+}
+
 div.page_container {
     width:770px;
-    margin-left: 12px;
+    margin-left: 20px;
 }
 
 div.word_wrapper{
@@ -24,7 +30,7 @@ div.word_wrapper{
 }
 
 div.word {
-    margin-left: 10px;
+    margin-left: 20px;
     display:inline-block;
 }
 
@@ -59,7 +65,49 @@ div.word_meaning {
 
 a.blank_link {
     text-decoration: none;
-    color:black;
+    color:inherit;
+}
+
+div.header {
+    text-align: center;
+    font-size: 1.5em;
+}
+
+div.dark-box {
+    color: white;
+    background: #34495e;
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #dddddd;
+}
+
+div.light-box {
+    /*color: white;*/
+    background: rgba(116, 161, 198, 0.25);
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #dddddd;
+}
+
+div.dark-box .highlighted_word {
+    color: rgb(255, 147, 127);
+}
+
+div.dark-box .blank_link:hover {
+    color: rgb(255, 147, 127);
+    text-decoration: none;
+}
+
+div.white-box a.blank_link:hover {
+    background: rgba(108, 147, 180, 0.52);
+}
+
+
+div.white-box {
+    background: white;
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #dddddd;
 }
 
 p.aya, div.page {
@@ -67,15 +115,19 @@ p.aya, div.page {
 }
 
 p.aya {
-    font-size: 2em
+    font-size: 2.5em
 }
 
 p.aya span.key {
-    font-size: 0.66em;
+    padding: 3px;
+    font-size: .6em;
+    border: 1px silver;
+    background: rgba(116, 161, 198, 0.25);
+
 }
 
-.highlighted_word {
-    background-color: cornsilk;
+.highlighted_word,
+div.light-box .highlighted_word {
     color:crimson;
 }
 
@@ -95,13 +147,13 @@ div.page {
     background-color: rgba(245, 243, 241, 0.64);
 }
 
-span.key a.aya_numerals {
+div.page span.key a.aya_numerals {
     text-decoration: none;
     color: gray;
     font-size: .8em;
 }
 
-div.page div.header {
+div.page div.sura-header {
     /*height: 2em;*/
     /*noinspection CssUnknownTarget*/
     background: url('/static/quran/header_contrasted22.svg') no-repeat center center;
