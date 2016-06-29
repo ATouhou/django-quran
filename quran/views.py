@@ -33,7 +33,7 @@ class PageView(TemplateView):
         ayas = Aya.objects.filter(id__gte=page.aya_begin_id, id__lte=page.aya_end_id)\
             .prefetch_related(prefetch_aya_translations(self.request))
         context['ayas'] = ayas
-        context['display_word_meanings'] = get_setting(self.request, 'display_word_meanings')
+        context['show_word_meanings'] = get_setting(self.request, 'show_word_meanings')
         context['page_number'] = int(page_number)
         return context
 
@@ -101,7 +101,7 @@ class RootIndexView(TemplateView):
 
 settings_list = {
     'translation': 1, #Translation.objects.first().id, # problem for migrating to another server
-    'display_word_meanings': False,
+    'show_word_meanings': False,
     'learning': False,
 }
 
