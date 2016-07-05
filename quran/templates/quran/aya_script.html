@@ -12,7 +12,7 @@
             var new_html = ''
             var words = old_html.trim().split(' ')
             var words_to_highlight = (words_to_highlight_in_aya[aya.id] || []).concat(words_to_highlight_in_page)
-            words_to_highlight.map(function(word){return remove_diacritics(word)})
+            words_to_highlight = words_to_highlight.map(function(word){return remove_diacritics(word)})
 
             words.forEach(function (word, index) {
 
@@ -29,7 +29,7 @@
                             + '<div class="word">'
                             + '<a class="word" href="{{base_url}}' + sura_number + '/' + aya_number + '/' + (index + 1) + '/" '
                             + 'target="_blank">' + word + '</a>'
-                            + '</div><div class="word_meaning ltr_safe">&nbsp;' + meanings[index] + '&nbsp;|</div></div>'
+                            + '</div><div class="word-meaning ltr_safe">&nbsp;' + meanings[index] + '&nbsp;|</div></div>'
                 else
                     new_html += '<div class="word_wrapper" data-word="' + index + '">'
                             + '<div class="word">'

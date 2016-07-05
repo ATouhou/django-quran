@@ -19,9 +19,9 @@
     {% endif %}
 </div>
 
-<div class="white-box">
+<div class="grammar-box">
     {% for segment in word.segments.all %}
-    {{segment.utext}}
+    <span class="highlighted_word">{{segment.utext}}</span>
 
     {% if segment.pos %} | {{segment.pos}} {% endif %}
     {% if segment.mood %} | MOOD: {{segment.mood}} {% endif %}

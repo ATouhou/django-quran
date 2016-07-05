@@ -4,8 +4,8 @@
 
 {% load quran %}
 
-{% if display_word_meanings %}
-<script> display_word_meanings = true </script>
+{% if show_word_meanings %}
+<script> show_word_meanings = true </script>
 {% endif %}
 
 <div class="page_container">
@@ -31,15 +31,15 @@
                                 </span>
 
                                 <span class="key" title="&lrm;{{aya.translations.all.0.text}}&lrm;">
-                                    {% if display_word_meanings %}
+                                    {% if show_word_meanings %}
                                     <div class="word_wrapper">
                                     {% endif %}
 
                                     <a class="aya_numerals" href="{{aya.get_absolute_url}}">﴿{{aya.number|arabic_numerals}}﴾</a>
 
-                                    {% if display_word_meanings %}
+                                    {% if show_word_meanings %}
                                     <br>
-                                    <div class="word_meaning" style="visibility:hidden;">.</div> <!-- just for spacing -->
+                                    <div class="word-meaning" style="visibility:hidden;">.</div> <!-- just for spacing -->
                                     </div>
                                     {% endif %}
                                 </span>

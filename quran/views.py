@@ -125,4 +125,3 @@ def prefetch_aya_translations(request):
     translation_id = get_setting(request, 'translation')
     return Prefetch('translations', queryset=AyaTranslation.objects.filter(translation_id=translation_id))
 
-
