@@ -100,12 +100,13 @@ class RootIndexView(TemplateView):
 
 
 settings_list = {
-    'translation': 1, #Translation.objects.first().id, # problem for migrating to another server
+    'translation_type': 1, #Translation.objects.first().id, # problem for migrating to another server
+    'show_translation': False,
     'show_word_meanings': False,
-    'learning': False,
+    'show_learning': False,
 }
 
-
+# function to set settings from url
 def settings(request):
     for setting, default in settings_list.items():
         if request.GET.get(setting, None):
@@ -122,6 +123,6 @@ def get_setting(request, setting):
 
 
 def prefetch_aya_translations(request):
-    translation_id = get_setting(request, 'translation')
+    translation_id = get_setting(request, 'translation_type')
     return Prefetch('translations', queryset=AyaTranslation.objects.filter(translation_id=translation_id))
 

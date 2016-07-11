@@ -26,7 +26,6 @@ div.page_container {
 
 div.word_wrapper{
     display:inline-block;
-    text-align:center;
 }
 
 div.word {
@@ -153,9 +152,9 @@ div.page {
     background-color: rgba(245, 243, 241, 0.64);
 }
 
-div.page span.key a.aya_numerals {
+.aya_numerals {
     text-decoration: none;
-    color: gray;
+    color: gray !important;
     font-size: .8em;
 }
 
