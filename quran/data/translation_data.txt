@@ -1,0 +1,25 @@
+Ahmed Ali;Ahmed Ali;Tanzil.net;http://tanzil.net/trans/;en.ahmedali.txt
+Ahmed Raza Khan;Ahmed Raza Khan;Tanzil.net;http://tanzil.net/trans/;en.ahmedraza.txt
+Arberry;A. J. Arberry;Tanzil.net;http://tanzil.net/trans/;en.arberry.txt
+Daryabadi;Abdul Majid Daryabadi;Tanzil.net;http://tanzil.net/trans/;en.daryabadi.txt
+Hilali & Khan;Muhammad Taqi-ud-Din al-Hilali and Muhammad Muhsin Khan;Tanzil.net;http://tanzil.net/trans/;en.hilali.txt
+Itani;Talal Itani;Tanzil.net;http://tanzil.net/trans/;en.itani.txt
+Maududi;Abul Ala Maududi;Tanzil.net;http://tanzil.net/trans/;en.maududi.txt
+Mubarakpuri;Safi-ur-Rahman al-Mubarakpuri;Tanzil.net;http://tanzil.net/trans/;en.mubarakpuri.txt
+Pickthall;Mohammed Marmaduke William Pickthall;Tanzil.net;http://tanzil.net/trans/;en.pickthall.txt
+Qarai;Ali Quli Qarai;Tanzil.net;http://tanzil.net/trans/;en.qarai.txt
+Qaribullah & Darwish;Hasan al-Fatih Qaribullah and Ahmad Darwish;Tanzil.net;http://tanzil.net/trans/;en.qaribullah.txt
+Saheeh International;Saheeh International;Tanzil.net;http://tanzil.net/trans/;en.sahih.txt
+Sarwar;Muhammad Sarwar;Tanzil.net;http://tanzil.net/trans/;en.sarwar.txt
+Shakir;Mohammad Habib Shakir;Tanzil.net;http://tanzil.net/trans/;en.shakir.txt
+Transliteration;English Transliteration;Tanzil.net;http://tanzil.net/trans/;en.transliteration.txt
+Wahiduddin Khan;Wahiduddin Khan;Tanzil.net;http://tanzil.net/trans/;en.wahiduddin.txt
+Yusuf Ali;Abdullah Yusuf Al;Tanzil.net;http://tanzil.net/trans/;en.yusufali.txt
+Abdulbakî Gölpınarlı;Abdulbaki Golpinarli;Tanzil.net;http://tanzil.net/trans/;tr.golpinarli.txt
+Ali Bulaç;Alİ Bulaç;Tanzil.net;http://tanzil.net/trans/;tr.bulac.txt
+Çeviriyazı;Muhammet Abay;Tanzil.net;http://tanzil.net/trans/;tr.transliteration.txt
+Diyanet İşleri;Diyanet Isleri;Tanzil.net;http://tanzil.net/trans/;tr.diyanet.txt
+Diyanet Vakfı;Diyanet Vakfi;Tanzil.net;http://tanzil.net/trans/;tr.vakfi.txt
+Elmalılı Hamdi Yazır;Elmalili Hamdi Yazir;Tanzil.net;http://tanzil.net/trans/;tr.yazir.txt
+Suat Yıldırım;Suat Yildirim;Tanzil.net;http://tanzil.net/trans/;tr.yildirim.txt
+Süleyman Ateş;Suleyman Ates;Tanzil.net;http://tanzil.net/trans/;tr.ates.txt

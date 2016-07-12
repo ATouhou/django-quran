@@ -76,12 +76,12 @@ def import_quran():
 
 def import_translations():
     print("----- importing translations -----")
-    translator_data = open(path_to('data/zekr/translator_data.txt'))
+    translator_data = open(path_to('data/translation_data.txt'))
     for line in translator_data.readlines():
         name, translator, source_name, source_url, filename = line.strip().split(';')
         translation = Translation(ttext=name, translator=translator, source_name=source_name, source_url=source_url)
         translation.save()
-        import_translation_txt(path_to('data/zekr/%s' % filename), translation)
+        import_translation_txt(path_to('data/tanzil-trans/%s' % filename), translation)
 
 
 @transaction.atomic
