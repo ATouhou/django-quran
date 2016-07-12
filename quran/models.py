@@ -127,7 +127,7 @@ class TranslationModel(models.Model):
 class Translation(TranslationModel):
     """Metadata relating to a translation of the Quran"""
     ttext = models.CharField(blank=False, max_length=50)
-    translator = models.CharField(blank=False, max_length=50)
+    translator = models.CharField(blank=False, max_length=100)
     source_name = models.CharField(blank=False, max_length=50)
     source_url = models.URLField(blank=False)
 
