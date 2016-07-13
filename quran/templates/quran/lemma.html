@@ -14,6 +14,7 @@
 {% include "quran/aya_p.html" with aya=word.aya %}
 <script>words_to_highlight_in_aya['{{word.aya.aya_id}}'] = ["{{word.utext}}"]</script>
 {% endfor %}
-{% include "quran/aya_script.html" %}
+
+{% include "quran/page_script.html" %}
 
 {% endblock %}

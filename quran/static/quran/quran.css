@@ -52,11 +52,11 @@ div.word_meaning {
 }
 
 .outer_frame {
-    border:solid 5px #BA5428;
+    border:solid 5px;
 }
 
 .inner_frame {
-    border: 10px solid #d8c397;
+    border: 10px solid;
 }
 
 a.blank_link {
@@ -71,7 +71,7 @@ div.header {
 
 div.dark-box {
     color: white;
-    background: #34495e;
+    background: black;
     padding: 10px;
     margin: 10px;
     border: 1px solid #dddddd;
@@ -79,7 +79,7 @@ div.dark-box {
 
 div.light-box,
 div.grammar-box {
-    background: rgba(116, 161, 198, 0.25);
+    background: #dddddd;
     padding: 10px;
     margin: 10px;
     border: 1px solid #dddddd;
@@ -127,7 +127,7 @@ p.aya span.key {
     padding: 3px;
     font-size: .6em;
     border: 1px silver;
-    background: rgba(116, 161, 198, 0.25);
+    background: #dddddd;
 
 }
 
@@ -161,11 +161,11 @@ div.page {
 div.page div.sura-header {
     /*height: 2em;*/
     /*noinspection CssUnknownTarget*/
-    background: url('/static/quran/header_contrasted22.svg') no-repeat center center;
     background-size: 100%;
     text-align: center;
     padding: 1em;
     font-size: 1em;
+    border: 1px solid;
 
 }
 

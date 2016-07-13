@@ -69,7 +69,7 @@ class LemmaView(TemplateView):
     def get_context_data(self, lemma_id, **kwargs):
         context = super(LemmaView, self).get_context_data(**kwargs)
         lemma = get_object_or_404(Lemma, pk=lemma_id)
-        aya_translation_queryset = AyaTranslation.objects.filter(translation_id=get_setting(self.request, 'translation'))
+        aya_translation_queryset = AyaTranslation.objects.filter(translation_id=get_setting(self.request, 'translation_type'))
         words = lemma.words.all() \
             .order_by('sura_id', 'aya_id') \
             .prefetch_related('aya') \
@@ -85,7 +85,7 @@ class RootView(TemplateView):
         context = super(RootView, self).get_context_data(**kwargs)
         lemmas = Lemma.objects.filter(root__id=root_id)\
             .prefetch_related('words__aya')\
-            .prefetch_related(Prefetch('words__aya__translations', queryset=AyaTranslation.objects.filter(translation_id=get_setting(self.request, 'translation'))))
+            .prefetch_related(Prefetch('words__aya__translations', queryset=AyaTranslation.objects.filter(translation_id=get_setting(self.request, 'translation_type'))))
         context['lemmas'] = lemmas  # , 'ayas': ayas
         return context
 
@@ -103,7 +103,6 @@ settings_list = {
     'translation_type': 1, #Translation.objects.first().id, # problem for migrating to another server
     'show_translation': False,
     'show_word_meanings': False,
-    'show_learning': False,
 }
 
 # function to set settings from url
@@ -115,7 +114,7 @@ def settings(request):
                 request.session[setting] = False
     return redirect('quran_index')
 
-
+# to be overridden
 def get_setting(request, setting):
     if not setting in request.session:
         request.session[setting] = settings_list[setting]
