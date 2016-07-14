@@ -90,16 +90,12 @@ class Aya(QuranicToken):
 
     @property
     def key(self):
-        return self.sura.key + '.' + str(self.number)
+        return str(self.sura_id) + '.' + str(self.number)
 
     @property
-    def aya_id(self):
+    def html_id(self):
         return 'id_' + str(self.sura_id) + '_' + str(self.number)
 
-    @property
-    def word_meanings_json(self):
-        meanings=list(self.word_meanings.all().order_by('number').values_list('ttext', flat=True))
-        return '<script>word_meanings["' + self.aya_id + '"]=["' + '", "'.join(meanings) + '"]</script>'
 
 
 class Page(models.Model):
